@@ -45,15 +45,15 @@ const DS4_AXIS_LABELS := {
 }
 
 var last_input_kind: StringName = KIND_KEYBOARD
-## Last joypad that produced input (-1 = none yet).
+## Last joypad that produced input (-1 = none yet). Only real input sets it, so
+## an idle, unplugged pad never counts as the player's controller.
 var active_device: int = -1
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	Input.joy_connection_changed.connect(_on_joy_connection_changed)
-	if not get_connected_joypads().is_empty():
-		active_device = get_connected_joypads()[0]
+	GameState.settings_changed.connect(_on_settings_changed)
 	set_stick_deadzone(float(GameState.get_setting(&"stick_deadzone", 0.2)))
 
 
@@ -88,8 +88,6 @@ func get_device_name(device: int) -> String:
 func _on_joy_connection_changed(device: int, connected: bool) -> void:
 	var device_name := Input.get_joy_name(device)
 	if connected:
-		if active_device < 0:
-			active_device = device
 		device_connected.emit(device, device_name)
 	else:
 		_safe_stop(device)
@@ -145,6 +143,10 @@ func set_stick_deadzone(value: float) -> void:
 			InputMap.action_set_deadzone(action, value)
 	if not is_equal_approx(float(GameState.get_setting(&"stick_deadzone", -1.0)), value):
 		GameState.set_setting(&"stick_deadzone", value)
+
+func _on_settings_changed(key: StringName, value: Variant) -> void:
+	if key == &"stick_deadzone":
+		set_stick_deadzone(float(value))
 
 func get_stick_deadzone() -> float:
 	return float(GameState.get_setting(&"stick_deadzone", 0.2))

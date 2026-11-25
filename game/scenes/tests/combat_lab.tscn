@@ -20,11 +20,10 @@ size = Vector2(16, 60)
 [sub_resource type="RectangleShape2D" id="Rect_mogu_trigger"]
 size = Vector2(64, 24)
 
-[node name="CombatLab" type="Node2D" node_paths=PackedStringArray("boss", "side_boss", "victory_checkpoint", "debug_label", "info_label")]
+[node name="CombatLab" type="Node2D" node_paths=PackedStringArray("boss", "side_boss", "debug_label", "info_label")]
 script = ExtResource("1_lab")
 boss = NodePath("Arena/Boss")
 side_boss = NodePath("MoguBottleBoss")
-victory_checkpoint = NodePath("Interactables/CheckpointPreBoss")
 debug_label = NodePath("LabUI/DebugLabel")
 info_label = NodePath("LabUI/InfoLabel")
 

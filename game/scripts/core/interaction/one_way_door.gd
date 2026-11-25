@@ -85,6 +85,7 @@ func _set_open(value: bool, instant: bool) -> void:
 				child.set_deferred(&"disabled", value)
 	if value and open_flag != &"":
 		GameState.set_flag(open_flag, true)
+		GameState.commit_progress()  # milestone: shortcut stays open after death
 	if value:
 		opened.emit()
 	if not instant:

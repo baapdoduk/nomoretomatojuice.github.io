@@ -56,6 +56,10 @@ func change_scene(scene_path: String, spawn_id: StringName = &"", fade_time: flo
 		push_error("SceneRouter: scene not found: %s" % scene_path)
 		return
 	is_transitioning = true
+	# Leaving a scene while the death delay runs (pause menu > hub, corpse sliding
+	# into an exit) would otherwise carry 0 HP into a scene that can't kill us.
+	if GameState.is_dead():
+		GameState.refill_health()
 	transition_started.emit(scene_path, spawn_id)
 	InputFeedback.stop_all_rumble()
 	var tree := get_tree()

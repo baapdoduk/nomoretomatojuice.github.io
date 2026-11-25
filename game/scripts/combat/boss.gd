@@ -225,6 +225,7 @@ func _on_died() -> void:
 	_enter(State.DEFEATED)
 	if config.defeated_flag != &"":
 		GameState.set_flag(config.defeated_flag, true)
+		GameState.commit_progress()  # milestone: survives a later death
 	defeated.emit()
 	if config.defeat_behavior != BossConfig.DefeatBehavior.KEEP:
 		_remove_left = config.defeat_remove_delay

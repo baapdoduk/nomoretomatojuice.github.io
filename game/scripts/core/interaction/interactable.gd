@@ -42,6 +42,10 @@ signal focus_changed(focused: bool)
 
 var is_busy: bool = false
 var has_been_used: bool = false
+## Subclasses set this to true inside _perform() when the interaction did not
+## succeed (cancelled, timed out, refused). The required item is then NOT
+## consumed and the interactable is not marked used (one_shot stays available).
+var perform_failed: bool = false
 var is_focused: bool = false
 
 
@@ -87,11 +91,15 @@ func interact(actor: Node) -> void:
 			GameState.notify(blocked_message)
 		return
 	is_busy = true
-	if required_item != &"" and consume_required_item:
-		GameState.remove_item(required_item)
+	perform_failed = false
 	interacted.emit(actor)
 	await _perform(actor)
-	has_been_used = true
+	if not perform_failed:
+		# Same frame as a synchronous _perform, so a milestone commit requested
+		# there captures "item spent + effect applied" together.
+		if required_item != &"" and consume_required_item:
+			GameState.remove_item(required_item)
+		has_been_used = true
 	is_busy = false
 	interaction_finished.emit()
 
@@ -101,5 +109,6 @@ func _can_interact(_actor: Node) -> bool:
 	return true
 
 ## Override: the actual effect. May await (popups, context actions, ...).
+## Set `perform_failed = true` if the interaction did not succeed.
 func _perform(_actor: Node) -> void:
 	pass

@@ -153,6 +153,7 @@ func _open() -> void:
 	if open_flag != &"":
 		_latched = true
 		GameState.set_flag(open_flag, true)
+		GameState.commit_progress()  # milestone: opened gates survive a later death
 	_set_collision(false)
 	opened.emit()
 	_emit_changed()

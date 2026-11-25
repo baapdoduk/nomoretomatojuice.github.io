@@ -120,6 +120,8 @@ func _evaluate() -> void:
 		return
 	set_active(now)
 	if now:
+		if solved_flag != &"":
+			GameState.commit_progress()  # milestone: solved state survives a later death
 		solved.emit()
 		state_changed.emit(true)
 		_play_feedback()

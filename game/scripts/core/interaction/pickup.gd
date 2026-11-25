@@ -72,6 +72,8 @@ func collect(player: Player = null) -> bool:
 	_hide_collected()
 	if not added:
 		return false
+	if item.type != ItemData.ItemType.CONSUMABLE:
+		GameState.commit_progress()  # milestone: keys / memories survive a later death
 	var label := item.display_name if item.display_name != "" else String(item.id)
 	if toast_format != "":
 		GameState.notify(toast_format % label if toast_format.contains("%s") else toast_format)

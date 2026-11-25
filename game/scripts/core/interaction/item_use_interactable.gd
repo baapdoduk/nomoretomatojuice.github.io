@@ -37,6 +37,7 @@ func _perform(_actor: Node) -> void:
 	_active = true
 	if success_flag != &"":
 		GameState.set_flag(success_flag, true)
+	GameState.commit_progress()  # milestone: item spent + effect committed together
 	if success_message != "":
 		GameState.notify(success_message)
 	used.emit(required_item)

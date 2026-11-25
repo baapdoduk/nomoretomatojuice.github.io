@@ -22,6 +22,9 @@ signal state_restored
 ## UI-facing transient message (toast). The HUD listens; no HUD = silently ignored.
 signal notification_requested(text: String, duration: float)
 signal settings_changed(key: StringName, value: Variant)
+## Emitted once per frame after commit_progress() folded live progress into the
+## respawn snapshot(s). Payload = the updated checkpoint (or scene_entry).
+signal progress_committed(snapshot: Dictionary)
 
 const SAVE_VERSION := 1
 const SAVE_PATH := "user://save_slot_0.json"
@@ -55,6 +58,7 @@ var _items: Dictionary = {}      # StringName -> int (count)
 var _item_data: Dictionary = {}  # StringName -> ItemData
 var _flags: Dictionary = {}      # StringName -> Variant
 var _death_emitted := false
+var _commit_pending := false
 
 
 # --------------------------------------------------------------------------- lifecycle
@@ -71,6 +75,7 @@ func new_game(starting_max_health: int = 5) -> void:
 	death_count = 0
 	deaths_since_checkpoint = 0
 	_death_emitted = false
+	_commit_pending = false
 	health_changed.emit(health, max_health)
 	inventory_changed.emit()
 	state_restored.emit()
@@ -223,6 +228,7 @@ func restore_snapshot(snapshot: Dictionary) -> void:
 	max_health = int(snapshot.get("max_health", max_health))
 	health = clampi(int(snapshot.get("health", max_health)), 1, max_health)
 	_death_emitted = false
+	_commit_pending = false
 	current_chapter = StringName(String(snapshot.get("chapter", "")))
 	_items.clear()
 	var paths: Dictionary = snapshot.get("item_paths", {})
@@ -246,8 +252,11 @@ func restore_snapshot(snapshot: Dictionary) -> void:
 func save_checkpoint(scene_path: String, spawn_id: StringName, refill: bool = true) -> void:
 	if refill:
 		refill_health()
+	var same_checkpoint := not checkpoint.is_empty() and String(checkpoint.get("scene_path", "")) == scene_path \
+		and String(checkpoint.get("spawn_id", "")) == String(spawn_id)
 	checkpoint = make_snapshot(scene_path, spawn_id)
-	deaths_since_checkpoint = 0
+	if not same_checkpoint:
+		deaths_since_checkpoint = 0
 	checkpoint_saved.emit(checkpoint)
 	if settings.get(&"autosave_on_checkpoint", false):
 		save_to_disk()
@@ -262,6 +271,50 @@ func begin_chapter(chapter_id: StringName, scene_path: String, spawn_id: StringN
 	chapter_start = make_snapshot(scene_path, spawn_id)
 	checkpoint = chapter_start.duplicate(true)
 	deaths_since_checkpoint = 0
+
+## Milestone commit (progress policy, see ARCHITECTURE.md §6).
+## Death still restores the whole snapshot, but milestone progress (boss defeated,
+## puzzle solved, shortcut opened, key/memory collected, item used) must survive.
+## This folds the *entire* live items + flags (+ max_health) into the respawn
+## snapshot(s) while keeping their scene, spawn and health. Atomic (items and
+## flags always move together, so no duplication/loss) and deferred/coalesced to
+## the end of the frame so multi-step mutations (add_item + set_flag) are captured
+## whole. Never touches chapter_start ("Restart chapter" reverts everything).
+## Components call it automatically; custom scripts use set_milestone().
+func commit_progress() -> void:
+	if _commit_pending:
+		return
+	_commit_pending = true
+	_flush_commit.call_deferred()
+
+## set_flag() + commit_progress(), for cutscenes / custom level scripts.
+func set_milestone(flag: StringName, value: Variant = true) -> void:
+	set_flag(flag, value)
+	commit_progress()
+
+func _flush_commit() -> void:
+	if not _commit_pending:
+		return  # cancelled by new_game()/restore
+	_commit_pending = false
+	if is_dead():
+		return  # the player did not survive the frame: nothing is committed
+	var live := make_snapshot("", &"")
+	var committed := {}
+	for target: Dictionary in [checkpoint, scene_entry]:
+		if target.is_empty():
+			continue
+		target["items"] = (live["items"] as Dictionary).duplicate(true)
+		target["item_paths"] = (live["item_paths"] as Dictionary).duplicate(true)
+		target["flags"] = (live["flags"] as Dictionary).duplicate(true)
+		target["max_health"] = max_health
+		target["health"] = clampi(int(target.get("health", max_health)), 1, max_health)
+		if committed.is_empty():
+			committed = target
+	if committed.is_empty():
+		return
+	progress_committed.emit(committed)
+	if settings.get(&"autosave_on_checkpoint", false) and has_checkpoint():
+		save_to_disk()
 
 ## Bookkeeping hook used by SceneRouter.respawn_at_checkpoint().
 func note_death() -> void:
@@ -322,7 +375,7 @@ func load_from_disk(path: String = SAVE_PATH) -> bool:
 		return false
 	var saved_settings: Dictionary = data.get("settings", {})
 	for key in saved_settings:
-		settings[StringName(String(key))] = _normalize_json_value(saved_settings[key])
+		set_setting(StringName(String(key)), _normalize_json_value(saved_settings[key]))
 	death_count = int(data.get("death_count", 0))
 	chapter_start = data.get("chapter_start", {})
 	checkpoint = data.get("checkpoint", {})
