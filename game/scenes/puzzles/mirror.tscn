@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/light/mirror.gd" id="1_gxtgm"]
+[ext_resource type="Resource" path="res://resources/puzzles/default_puzzle_config.tres" id="2_08hrw"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable.gd" id="3_har7f"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/mirror_visual.gd" id="4_vgxx6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_poedj"]
+size = Vector2(24, 4)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_k5nuf"]
+radius = 18.0
+
+[node name="Mirror" type="StaticBody2D" unique_id=1335719069 node_paths=PackedStringArray("interactable")]
+script = ExtResource("1_gxtgm")
+config = ExtResource("2_08hrw")
+interactable = NodePath("Interactable")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1490650791]
+shape = SubResource("RectangleShape2D_poedj")
+
+[node name="Interactable" type="Area2D" parent="." unique_id=1297072297]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("3_har7f")
+prompt_text = "Rotate"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Interactable" unique_id=1913138763]
+shape = SubResource("CircleShape2D_k5nuf")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1067549791]
+script = ExtResource("4_vgxx6")

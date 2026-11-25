@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/puzzle_controller.gd" id="1_8aw4q"]
+[ext_resource type="Resource" path="res://resources/puzzles/default_puzzle_config.tres" id="2_4qt5j"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/puzzle_device_visual.gd" id="3_7hmdw"]
+
+[node name="PuzzleController" type="Node2D" unique_id=909008091 node_paths=PackedStringArray("success_player", "flash_targets")]
+script = ExtResource("1_8aw4q")
+success_player = NodePath("SuccessSound")
+flash_targets = [NodePath("Visual")]
+config = ExtResource("2_4qt5j")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1715082582]
+script = ExtResource("3_7hmdw")
+shape = 4
+size = Vector2(14, 14)
+color = Color(0.6, 1, 0.7, 1)
+
+[node name="SuccessSound" type="AudioStreamPlayer2D" parent="." unique_id=1843423626]

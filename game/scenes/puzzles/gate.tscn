@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/gate.gd" id="1_28nr8"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/gate_visual.gd" id="2_m2n8v"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_klojs"]
+size = Vector2(16, 48)
+
+[node name="Gate" type="StaticBody2D" unique_id=89736759]
+script = ExtResource("1_28nr8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2103776598]
+shape = SubResource("RectangleShape2D_klojs")
+
+[node name="Visual" type="Node2D" parent="." unique_id=574448492]
+script = ExtResource("2_m2n8v")

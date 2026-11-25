@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/puzzle_switch.gd" id="1_llmrq"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable.gd" id="2_vvdai"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/puzzle_device_visual.gd" id="3_wumdf"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kowth"]
+radius = 20.0
+
+[node name="Switch" type="Node2D" unique_id=1424020406 node_paths=PackedStringArray("interactable")]
+script = ExtResource("1_llmrq")
+interactable = NodePath("Interactable")
+
+[node name="Interactable" type="Area2D" parent="." unique_id=933842698]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("2_vvdai")
+prompt_text = "Use"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Interactable" unique_id=2145821264]
+shape = SubResource("CircleShape2D_kowth")
+
+[node name="Visual" type="Node2D" parent="." unique_id=754763722]
+script = ExtResource("3_wumdf")
+shape = 3
+color = Color(0.9, 0.8, 0.5, 1)

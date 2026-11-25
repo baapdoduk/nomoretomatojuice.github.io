@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/pressure_plate.gd" id="1_ckbrb"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/puzzle_device_visual.gd" id="2_2eldf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cv24q"]
+size = Vector2(24, 8)
+
+[node name="PressurePlate" type="Node2D" unique_id=1600791588 node_paths=PackedStringArray("detector")]
+script = ExtResource("1_ckbrb")
+detector = NodePath("Detector")
+
+[node name="Detector" type="Area2D" parent="." unique_id=301134595]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Detector" unique_id=1509447818]
+shape = SubResource("RectangleShape2D_cv24q")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1853920852]
+script = ExtResource("2_2eldf")
+shape = 2
+size = Vector2(24, 6)
+color = Color(0.7, 0.75, 0.8, 1)

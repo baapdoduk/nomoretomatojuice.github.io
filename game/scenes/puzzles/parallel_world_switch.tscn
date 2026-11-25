@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/state/parallel_world_switch.gd" id="1_13egj"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable.gd" id="2_45rwj"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/puzzle_device_visual.gd" id="3_jdi7e"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cjh6t"]
+radius = 20.0
+
+[node name="ParallelWorldSwitch" type="Node2D" unique_id=182517523 node_paths=PackedStringArray("interactable")]
+script = ExtResource("1_13egj")
+blocked_message = "Can't shift here - you would be stuck inside the other world."
+interactable = NodePath("Interactable")
+
+[node name="Interactable" type="Area2D" parent="." unique_id=2059903200]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("2_45rwj")
+prompt_text = "Shift"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Interactable" unique_id=1956849690]
+shape = SubResource("CircleShape2D_cjh6t")
+
+[node name="Visual" type="Node2D" parent="." unique_id=545054558]
+script = ExtResource("3_jdi7e")
+shape = 3
+color = Color(0.6, 0.8, 1, 1)

@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/light/light_emitter.gd" id="1_q2bcl"]
+[ext_resource type="Resource" path="res://resources/puzzles/default_puzzle_config.tres" id="2_nbe64"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/emitter_visual.gd" id="3_n05ud"]
+[ext_resource type="Script" path="res://scripts/puzzles/light/light_beam.gd" id="4_1ahr8"]
+
+[node name="LightEmitter" type="Node2D" unique_id=1015695831]
+script = ExtResource("1_q2bcl")
+config = ExtResource("2_nbe64")
+
+[node name="Visual" type="Node2D" parent="." unique_id=16484461]
+script = ExtResource("3_n05ud")
+
+[node name="Beam" type="Line2D" parent="." unique_id=1341941393]
+script = ExtResource("4_1ahr8")

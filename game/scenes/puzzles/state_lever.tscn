@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/state/state_lever.gd" id="1_qk1g6"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable.gd" id="2_hap7b"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/puzzle_device_visual.gd" id="3_ebtss"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ckrry"]
+radius = 20.0
+
+[node name="StateLever" type="Node2D" unique_id=680347428 node_paths=PackedStringArray("interactable")]
+script = ExtResource("1_qk1g6")
+interactable = NodePath("Interactable")
+
+[node name="Interactable" type="Area2D" parent="." unique_id=2141053895]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("2_hap7b")
+prompt_text = "Pull"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Interactable" unique_id=1707928403]
+shape = SubResource("CircleShape2D_ckrry")
+
+[node name="Visual" type="Node2D" parent="." unique_id=529676915]
+script = ExtResource("3_ebtss")
+shape = 3
+color = Color(0.6, 0.8, 1, 1)

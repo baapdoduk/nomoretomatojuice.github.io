@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/state/state_sensor.gd" id="1_xrro0"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/puzzle_device_visual.gd" id="2_6sgw8"]
+
+[node name="StateSensor" type="Node2D" unique_id=1111649018]
+script = ExtResource("1_xrro0")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1018415210]
+script = ExtResource("2_6sgw8")
+shape = 1
+size = Vector2(10, 10)
+color = Color(0.6, 0.8, 1, 1)
