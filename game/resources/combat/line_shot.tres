@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AttackPattern" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/attack_pattern.gd" id="1_48vym"]
+
+[resource]
+script = ExtResource("1_48vym")
+id = &"line_shot"
+display_name = "Line Shot"
+shape = 2
+line_length = 320.0
+line_width = 16.0
+origin = 0
+active_time = 0.15
+tags = Array[StringName]([&"projectile"])
+projectile_speed = 320.0
+projectile_lifetime = 1.0
+projectile_radius = 7.0

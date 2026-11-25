@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AttackPattern" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/attack_pattern.gd" id="1_0qb3o"]
+
+[resource]
+script = ExtResource("1_0qb3o")
+id = &"mogu_nata_volley"
+display_name = "Nata-de-coco Volley (placeholder)"
+shape = 1
+radius = 240.0
+cone_angle_degrees = 70.0
+origin = 0
+active_time = 0.15
+tags = Array[StringName]([&"projectile", &"nata_de_coco"])
+projectile_speed = 170.0
+projectile_count = 7
+projectile_spread_degrees = 70.0
+projectile_lifetime = 1.6
+projectile_radius = 4.0
+telegraph_color = Color(1, 0.95, 0.6, 1)
+active_color = Color(1, 1, 1, 1)

@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/projectile.gd" id="1_de2h6"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ptxme"]
+radius = 6.0
+
+[node name="Projectile" type="Area2D" unique_id=132325538]
+collision_layer = 16
+collision_mask = 3
+script = ExtResource("1_de2h6")
+
+[node name="Collision" type="CollisionShape2D" parent="." unique_id=1565785642]
+shape = SubResource("CircleShape2D_ptxme")
+
+[node name="ScreenNotifier" type="VisibleOnScreenNotifier2D" parent="." unique_id=1782959600]
+rect = Rect2(-8, -8, 16, 16)
+
+[node name="Visual" type="Polygon2D" parent="." unique_id=1499948399]
+color = Color(1, 0.95, 0.75, 1)
+polygon = PackedVector2Array(6, 0, 5.196152, 3, 2.9999998, 5.1961527, -2.6226832e-07, 6, -3.0000005, 5.196152, -5.196152, 3.0000005, -6, -5.2453663e-07, -5.196152, -2.9999998, -2.9999995, -5.1961527, 7.154928e-08, -6, 2.9999995, -5.1961527, 5.1961517, -3.000001)
