@@ -4,7 +4,7 @@ extends PlayerTestCase
 
 const OW := "res://scenes/tests/integration_overworld.tscn"
 const IN := "res://scenes/tests/integration_interior.tscn"
-const BOSS_FLAG := &"boss.test_boss.defeated"
+const BOSS_FLAG := &"boss.int_guardian.defeated"
 
 
 func after_each() -> void:

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="BossConfig" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/boss_phase.gd" id="1_qmhoi"]
+[ext_resource type="Script" path="res://scripts/resources/attack_pattern.gd" id="2_sr3dl"]
+[ext_resource type="Resource" path="res://resources/combat/circle_drop.tres" id="3_vwxrx"]
+[ext_resource type="Resource" path="res://resources/combat/cone_volley.tres" id="4_fwl48"]
+[ext_resource type="Resource" path="res://resources/combat/sequential_drop.tres" id="5_tiu0j"]
+[ext_resource type="Resource" path="res://resources/combat/line_shot.tres" id="6_d1yto"]
+[ext_resource type="Script" path="res://scripts/resources/boss_config.gd" id="7_6fd3t"]
+
+[sub_resource type="Resource" id="Resource_22b55"]
+script = ExtResource("1_qmhoi")
+phase_name = "Phase 1"
+patterns = Array[ExtResource("2_sr3dl")]([ExtResource("3_vwxrx"), ExtResource("4_fwl48")])
+
+[sub_resource type="Resource" id="Resource_f5exp"]
+script = ExtResource("1_qmhoi")
+phase_name = "Phase 2"
+health_threshold = 0.6
+patterns = Array[ExtResource("2_sr3dl")]([ExtResource("5_tiu0j"), ExtResource("6_d1yto"), ExtResource("3_vwxrx")])
+order = 1
+idle_time = 0.8
+
+[sub_resource type="Resource" id="Resource_a5g05"]
+script = ExtResource("1_qmhoi")
+phase_name = "Phase 3"
+health_threshold = 0.3
+patterns = Array[ExtResource("2_sr3dl")]([ExtResource("5_tiu0j"), ExtResource("4_fwl48"), ExtResource("6_d1yto")])
+idle_time = 0.5
+
+[resource]
+script = ExtResource("7_6fd3t")
+id = &"test_boss"
+display_name = "Slice Guardian"
+max_health = 12
+phases = Array[ExtResource("1_qmhoi")]([SubResource("Resource_22b55"), SubResource("Resource_f5exp"), SubResource("Resource_a5g05")])
+contact_damage = 1
+defeated_flag = &"boss.int_guardian.defeated"

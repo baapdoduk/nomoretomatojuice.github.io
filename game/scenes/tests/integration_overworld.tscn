@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" path="res://scenes/puzzles/puzzle_controller.tscn" id="14_qj446"]
 [ext_resource type="PackedScene" path="res://scenes/combat/boss.tscn" id="15_s0c0h"]
 [ext_resource type="Script" path="res://scripts/combat/boss_fight_trigger.gd" id="16_gvhlh"]
+[ext_resource type="Resource" path="res://resources/combat/int_guardian_boss.tres" id="90_intboss"]
 [ext_resource type="PackedScene" path="res://scenes/core/interaction/one_way_door.tscn" id="17_ne2ns"]
 [ext_resource type="Script" path="res://scripts/tests/integration_goal.gd" id="18_uho4s"]
 [ext_resource type="Script" path="res://scripts/core/interaction/interactable_visual.gd" id="19_ic3sg"]
@@ -165,6 +166,7 @@ checkpoint_id = &"int_arena"
 
 [node name="Boss" parent="Arena" unique_id=2052288927 instance=ExtResource("15_s0c0h")]
 position = Vector2(870, 224)
+config = ExtResource("90_intboss")
 wait_for_trigger = true
 
 [node name="BossFightTrigger" type="Area2D" parent="Arena" unique_id=1401758041 node_paths=PackedStringArray("boss")]
@@ -178,7 +180,7 @@ shape = SubResource("RectangleShape2D_2127g")
 [node name="GateVictory" parent="Arena" unique_id=1057500891 instance=ExtResource("10_pcdjo")]
 position = Vector2(804, 88)
 rotation = 1.5707964
-required_flags = Array[StringName]([&"boss.test_boss.defeated"])
+required_flags = Array[StringName]([&"boss.int_guardian.defeated"])
 
 [node name="Corridor" type="Node2D" parent="." unique_id=946364166]
 
@@ -195,7 +197,7 @@ monitoring = false
 script = ExtResource("18_uho4s")
 prompt_text = "Finish"
 prompt_offset = Vector2(0, -40)
-required_flags = Array[StringName]([&"boss.test_boss.defeated"])
+required_flags = Array[StringName]([&"boss.int_guardian.defeated"])
 blocked_message = "The shrine is still sealed."
 locked_prompt_text = "Defeat the boss first"
 
