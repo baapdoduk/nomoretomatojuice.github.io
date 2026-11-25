@@ -62,6 +62,7 @@ func enter_lab(id: StringName) -> bool:
 	if SceneRouter.is_transitioning or not is_lab_available(id):
 		return false
 	var path := String(_find_lab(id).path)
+	GameState.refill_health()
 	GameState.begin_chapter(id, path, &"start")
 	SceneRouter.change_scene(path, &"start")
 	return true

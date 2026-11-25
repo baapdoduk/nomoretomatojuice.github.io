@@ -14,12 +14,10 @@ extends CanvasLayer
 ## "Restart from checkpoint" uses SceneRouter.respawn_at_checkpoint(), which counts
 ## as a death (death_count / assist tip) - intentionally treated as a "retry".
 ##
-## Pad bridge: while a GUI control has focus, Cross/Circle (JOY_BUTTON_A/B) are
-## re-emitted as ui_accept/ui_cancel unless the Input Map already maps them
-## (Godot 4.7's default ui_accept/ui_cancel have no joypad events).
+## Cross/Circle reach menus through the Input Map (ui_accept / ui_cancel).
 ##
-## Disconnect: when the active joypad disconnects (and no other pad remains active)
-## the menu auto-opens in disconnect mode. Any keyboard key continues with keyboard;
+## Disconnect: when the pad the player was actually using disconnects (it was
+## InputFeedback.active_device while last_input_kind == joypad) the menu auto-opens in disconnect mode. Any keyboard key continues with keyboard;
 ## after a reconnect any pad button (or Resume) continues. Scenes in group
 ## "no_disconnect_pause" (hub, Controller Lab) only get a toast. If a transition is
 ## running, the overlay opens once it finishes.
@@ -38,7 +36,10 @@ var mode: Mode = Mode.CLOSED
 var _paused_before := false
 var _pending_disconnect := false
 var _reconnected := false
+## Last frame's InputFeedback.active_device / last_input_kind (InputFeedback has
+## already reset them by the time device_disconnected is emitted).
 var _last_active_device := -1
+var _last_input_kind: StringName = &"keyboard"
 
 var _root: Control
 var _title: Label
@@ -76,6 +77,7 @@ func _connect_signals() -> void:
 	SceneRouter.transition_started.connect(_on_transition_started)
 	SceneRouter.transition_finished.connect(_on_transition_finished)
 	_last_active_device = InputFeedback.active_device
+	_last_input_kind = InputFeedback.last_input_kind
 
 
 # --------------------------------------------------------------------------- public API
@@ -140,12 +142,11 @@ func get_disconnect_text() -> String:
 # --------------------------------------------------------------------------- input
 
 func _process(_delta: float) -> void:
-	if InputFeedback.active_device >= 0:
-		_last_active_device = InputFeedback.active_device
+	_last_active_device = InputFeedback.active_device
+	_last_input_kind = InputFeedback.last_input_kind
 
 
 func _input(event: InputEvent) -> void:
-	_bridge_pad_to_ui(event)
 	if not is_open():
 		return
 	if mode == Mode.DISCONNECT:
@@ -166,32 +167,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 
-func _bridge_pad_to_ui(event: InputEvent) -> void:
-	var jb := event as InputEventJoypadButton
-	if jb == null:
-		return
-	var action := &""
-	if jb.button_index == JOY_BUTTON_A:
-		action = &"ui_accept"
-	elif jb.button_index == JOY_BUTTON_B:
-		action = &"ui_cancel"
-	else:
-		return
-	if event.is_action(action) or get_viewport().gui_get_focus_owner() == null:
-		return
-	var ev := InputEventAction.new()
-	ev.action = action
-	ev.pressed = jb.pressed
-	Input.parse_input_event(ev)
-
-
 # --------------------------------------------------------------------------- devices
 
 func _on_device_disconnected(device: int, device_name: String) -> void:
-	# _last_active_device is last frame's value: InputFeedback already switched it.
-	var was_active: bool = device == _last_active_device or not InputFeedback.has_joypad()
-	_last_active_device = InputFeedback.active_device
-	if not was_active:
+	# Only the pad the player was using counts; an idle pad unplugged during
+	# keyboard play just gets a toast.
+	var was_in_use: bool = device == _last_active_device and _last_input_kind == InputFeedback.KIND_JOYPAD
+	if device == _last_active_device:
+		_last_active_device = -1
+		_last_input_kind = InputFeedback.KIND_KEYBOARD
+	if not was_in_use:
 		GameState.notify("Controller disconnected: %s" % _name_or_default(device_name), 2.5)
 		return
 	var scene := get_tree().current_scene
@@ -208,7 +193,7 @@ func _on_device_disconnected(device: int, device_name: String) -> void:
 		open(true)
 
 
-func _on_device_connected(device: int, device_name: String) -> void:
+func _on_device_connected(_device: int, device_name: String) -> void:
 	if mode == Mode.DISCONNECT:
 		_reconnected = true
 		_disconnect_label.text = "Controller connected:\n%s\n\nPress any button (or Resume) to continue." % _name_or_default(device_name)
@@ -216,7 +201,6 @@ func _on_device_connected(device: int, device_name: String) -> void:
 	else:
 		_pending_disconnect = false
 		GameState.notify("Controller connected: %s" % _name_or_default(device_name), 2.5)
-	_last_active_device = device if InputFeedback.active_device < 0 else InputFeedback.active_device
 
 
 func _name_or_default(device_name: String) -> String:
@@ -231,8 +215,7 @@ func _on_transition_started(_path: String, _spawn: StringName) -> void:
 func _on_transition_finished(_path: String) -> void:
 	if _pending_disconnect:
 		_pending_disconnect = false
-		if not InputFeedback.has_joypad():
-			open(true)
+		open(true)
 
 
 # --------------------------------------------------------------------------- actions

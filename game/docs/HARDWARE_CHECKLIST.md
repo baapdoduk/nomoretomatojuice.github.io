@@ -76,6 +76,8 @@ move, jump, dash, attack, interact, use L2/R2 context actions, open/close the pa
 
 1. In a lab with gameplay (not the hub / Controller Lab), unplug the USB cable (or turn the pad off:
    hold PS ~10 s for Bluetooth).
+   Use the pad first (press any button) - only the pad you are actually playing with triggers
+   the auto-pause; unplugging an idle pad while playing on keyboard only shows a toast.
 2. Expected: game auto-pauses with "Controller disconnected. Reconnect it, or press any key to
    continue with keyboard."
 3. Press a keyboard key: game resumes with keyboard prompts.
@@ -124,7 +126,6 @@ columns ("API in build", "device reports"); copy them here and add your hardware
 
 ## Known limitations
 
-- Godot 4.7's default `ui_accept` / `ui_cancel` have no joypad events. The PauseMenu bridges
-  Cross -> ui_accept and Circle -> ui_cancel while a menu control has focus. If menus still do not
-  react to Cross, report it.
+- Menus use `ui_accept` (Cross) / `ui_cancel` (Circle) from the Input Map. If menus do not react
+  to Cross / Circle, report it.
 - Unsupported features must degrade silently (no errors, no blocked progress). Report any crash.

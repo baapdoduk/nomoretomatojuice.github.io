@@ -41,7 +41,10 @@ func test_missing_lab_disabled_and_not_enterable() -> void:
 
 func test_enter_lab_begins_chapter() -> void:
 	var hub := _make_hub()
+	GameState.apply_damage(3)
 	assert_true(hub.call(&"enter_lab", &"controller_lab"))
+	assert_eq(GameState.health, GameState.max_health, "health refilled on lab entry")
+	assert_eq(int(GameState.chapter_start.get("health")), GameState.max_health, "chapter snapshot at full HP")
 	await SceneRouter.transition_finished
 	assert_eq(GameState.current_chapter, &"controller_lab")
 	assert_eq(String(GameState.chapter_start.get("scene_path")), LAB)
