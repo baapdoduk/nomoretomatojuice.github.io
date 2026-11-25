@@ -44,7 +44,9 @@ Key APIs (read the scripts for full docs):
 | 5 | EnemyAttack | boss attack areas, projectiles | Player |
 | 6 | Interactable | Interactable areas | – (player Interactor masks 6) |
 
-Groups: `player`, `spawn_point`, `hud`, `boss`, `pushable`.
+Groups: `player`, `spawn_point`, `hud`, `boss`, `pushable`, `pause_menu`, `no_disconnect_pause` (scenes that only toast on pad disconnect: hub, controller lab), `light_emitters`, `state_driven`.
+
+Note: an Area2D only detects World StaticBody2D walls reliably when it is also `monitorable` (Projectile sets this). Pressure plates detect `CharacterBody2D`/`AnimatableBody2D` (PushBox), not StaticBody2D.
 
 ## 4. Input Map (project.godot; regenerate with tools/gen_input_map.gd)
 
@@ -67,10 +69,17 @@ Doors, switches, pickups, photo/dialog popups, item-use spots and context action
 
 ### Puzzle input contract — scripts/puzzles/puzzle_device.gd
 Any node with `signal activated_changed(active: bool)` + `func is_active() -> bool` can drive outputs. `PuzzleDevice` (Node2D) implements it plus `persist_flag` (state saved to GameState and restored on scene load), `start_active`, `set_active()`, `reset()`, `_apply_state(value, instant)`.
-Outputs reference inputs through exported `Array[Node]` (drag & drop in the Inspector) and connect to their signals — no hard-coded node paths in code.
+Outputs reference inputs through exported `Array[Node]` (drag & drop in the Inspector) and connect to their signals — no hard-coded node paths in code. Helpers: `PuzzleInputs` (evaluate/connect), `PuzzlePhysics` (anti-trap overlap queries).
+Subclasses whose state depends on external inputs (LightReceiver, PressurePlate) override `reset()` to re-sync instead of forcing `start_active`.
+
+### Light contract — scripts/puzzles/light/
+Ray hits ask the collider (or its parent) `get_light_response(hit: Dictionary, dir: Vector2) -> LightTracer.Response` (BLOCK / REFLECT / ABSORB); anything without it blocks. Anything that changes beam paths calls `LightTracer.notify_changed(get_tree())`. Limits from `PuzzleConfig`: 12 reflections, cycle detection (reflector + hit point + outgoing direction), epsilon offset along the normal, distance cap.
 
 ### UI primitive — scripts/core/ui/button_glyph.gd
 `ButtonGlyph` (Control): `action`, `force_kind`; draws DS4 face symbols / pills / key caps procedurally, follows `InputFeedback.last_input_kind`, texture overrides via `joypad_textures` / `keyboard_texture`.
+
+### UI
+`HUD` (group `hud`): `show_toast(text, duration)`; `show_status=false` hides hearts/items on menu scenes. `PauseMenu` (child of InputFeedback, group `pause_menu`): `open()/close()/is_open()`; restores the previous pause state; refuses during transitions; auto-pauses on active pad disconnect.
 
 ## 6. Policies
 
