@@ -57,6 +57,7 @@ GODOT=/path/to/godot ./tools/run_tests.sh
 - 테스트는 `tests/{unit,integration,smoke}/test_*.gd` (`TestCase` 상속, 외부 의존성 없음). 러너는 Logger로 엔진/스크립트 에러를 수집해 **에러가 난 테스트를 실패 처리**합니다.
 - 스모크 테스트는 `scenes/tests/*.tscn`의 모든 Lab을 자동으로 찾아 3초간 입력을 주입하고 에러 여부를 확인합니다(새 Lab 추가 시 자동 포함).
 - 로그: `game/.godot/test_logs/{import,check,tests}.log`
+- 화면 캡처(레이아웃 확인용): `xvfb-run -a godot --path game --rendering-driver opengl3 --resolution 1280x720 res://tools/capture_screens.tscn -- --out=/abs/dir` → 모든 Lab 스크린샷. 저장된 결과: [`docs/screenshots/`](docs/screenshots/)
 - 자동 테스트는 로직만 검증합니다. **화면 표시, 실제 DS4 조작감·진동·라이트바·센서, macOS 동작은 사용자 실기 확인 항목**입니다 → `docs/HARDWARE_CHECKLIST.md`.
 
 ## 4. 디렉터리 구조

@@ -213,9 +213,9 @@ size = Vector2(14, 28)
 color = Color(1, 0.8, 0.3, 1)
 
 [node name="GoalLandmark" parent="Corridor" unique_id=490775470 instance=ExtResource("20_xwrkv")]
-position = Vector2(36, 76)
+position = Vector2(124, 76)
 caption = "SHRINE"
-height = 40.0
+height = 30.0
 width = 12.0
 
 [node name="DoorHub" parent="Corridor" unique_id=1422961602 instance=ExtResource("8_5javt")]
@@ -237,9 +237,9 @@ layer = 9
 
 [node name="HelpLabel" type="Label" parent="LabUI" unique_id=411020758]
 offset_left = 6.0
-offset_top = 42.0
+offset_top = 344.0
 offset_right = 6.0
-offset_bottom = 42.0
+offset_bottom = 344.0
 theme_override_font_sizes/font_size = 8
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3

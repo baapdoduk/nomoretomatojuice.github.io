@@ -30,7 +30,27 @@ func _ready() -> void:
 	if custom_minimum_size == Vector2.ZERO:
 		custom_minimum_size = Vector2(18, 18)
 	if not Engine.is_editor_hint():
-		InputFeedback.input_kind_changed.connect(func(_k: StringName) -> void: queue_redraw())
+		InputFeedback.input_kind_changed.connect(func(_k: StringName) -> void:
+			update_minimum_size()
+			queue_redraw())
+	update_minimum_size()
+
+
+## Wide labels ("Space", "Escape", "Options") report their real width so
+## containers never overlap the glyph with neighbouring text.
+func _get_minimum_size() -> Vector2:
+	var base := custom_minimum_size if custom_minimum_size != Vector2.ZERO else Vector2(18, 18)
+	var glyph := get_glyph()
+	var label: String = glyph.get("label", "?")
+	if glyph.get("kind") == &"joypad" and (FACE_COLORS.has(label) or joypad_textures.has(label)):
+		return Vector2.ZERO
+	var font := get_theme_default_font()
+	if font == null:
+		return Vector2.ZERO
+	var font_size := int(clampf(base.y * 0.55, 6.0, 32.0))
+	var needed := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x + 6.0
+	# Combined with custom_minimum_size by Control (component-wise max).
+	return Vector2(needed, base.y)
 
 
 func get_glyph() -> Dictionary:
