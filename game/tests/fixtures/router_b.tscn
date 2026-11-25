@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://tests/fixtures/fixture_spawn.gd" id="1_spawn"]
+[ext_resource type="Script" path="res://tests/fixtures/fixture_player.gd" id="2_player"]
+
+[node name="Router_b" type="Node2D"]
+
+[node name="SpawnStart" type="Marker2D" parent="."]
+position = Vector2(10, 10)
+script = ExtResource("1_spawn")
+spawn_id = &"start"
+is_default = true
+
+[node name="SpawnDoor" type="Marker2D" parent="."]
+position = Vector2(300, 50)
+script = ExtResource("1_spawn")
+spawn_id = &"from_other"
+
+[node name="Player" type="Node2D" parent="."]
+position = Vector2(-100, -100)
+script = ExtResource("2_player")
