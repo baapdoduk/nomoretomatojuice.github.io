@@ -131,3 +131,15 @@ class _FailingInteractable extends Interactable:
 	var should_fail := true
 	func _perform(_actor: Node) -> void:
 		perform_failed = should_fail
+
+func test_coins_revert_on_death_but_milestone_keeps_them() -> void:
+	await change_scene_and_wait(A)
+	GameState.save_checkpoint(A, &"start")
+	GameState.add_coins(5)
+	await _die_and_respawn()
+	assert_eq(GameState.coins, 0, "coins after checkpoint revert (no farming)")
+	GameState.add_coins(3)
+	GameState.set_milestone(&"shard.x")
+	await wait_frames(2)
+	await _die_and_respawn()
+	assert_eq(GameState.coins, 3, "coins committed with a milestone")

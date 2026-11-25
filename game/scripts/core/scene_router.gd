@@ -18,12 +18,36 @@ signal transition_finished(scene_path: String)
 
 const DEFAULT_FADE := 0.25
 const FADE_LAYER := 100
+const STYLE_FADE := &"fade"
+const STYLE_IRIS := &"iris"
+## Iris wipe = circle closing on the player / opening on the new spawn.
+const TRANSITION_SHADER := """
+shader_type canvas_item;
+uniform float progress : hint_range(0.0, 1.0) = 0.0;
+uniform vec2 center = vec2(0.5);
+uniform float aspect = 1.7778;
+uniform bool iris = false;
+void fragment() {
+	float a = progress;
+	if (iris) {
+		vec2 d = UV - center;
+		d.x *= aspect;
+		float r = (1.0 - progress) * 2.1;
+		a = progress >= 0.999 ? 1.0 : smoothstep(r - 0.006, r + 0.006, length(d));
+	}
+	COLOR = vec4(0.0, 0.0, 0.0, a);
+}
+"""
 
 var is_transitioning := false
 var current_spawn_id: StringName = &""
+## Style used when change_scene() gets no explicit style.
+var default_style: StringName = STYLE_IRIS
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect
+var _fade_material: ShaderMaterial
+var _style: StringName = STYLE_FADE
 
 
 func _ready() -> void:
@@ -34,7 +58,12 @@ func _ready() -> void:
 	add_child(_fade_layer)
 	_fade_rect = ColorRect.new()
 	_fade_rect.color = Color.BLACK
-	_fade_rect.modulate.a = 0.0
+	var shader := Shader.new()
+	shader.code = TRANSITION_SHADER
+	_fade_material = ShaderMaterial.new()
+	_fade_material.shader = shader
+	_fade_rect.material = _fade_material
+	_set_progress(0.0)
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fade_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_fade_layer.add_child(_fade_rect)
@@ -49,7 +78,9 @@ func _capture_initial_scene() -> void:
 
 
 ## Main entry point. Safe to call repeatedly: ignored while a transition runs.
-func change_scene(scene_path: String, spawn_id: StringName = &"", fade_time: float = DEFAULT_FADE) -> void:
+## style: STYLE_FADE or STYLE_IRIS (empty = default_style).
+func change_scene(scene_path: String, spawn_id: StringName = &"", fade_time: float = DEFAULT_FADE,
+		style: StringName = &"") -> void:
 	if is_transitioning:
 		return
 	if not ResourceLoader.exists(scene_path):
@@ -64,6 +95,7 @@ func change_scene(scene_path: String, spawn_id: StringName = &"", fade_time: flo
 	InputFeedback.stop_all_rumble()
 	var tree := get_tree()
 	tree.paused = true
+	_style = style if style != &"" else default_style
 	await _fade_to(1.0, fade_time)
 	var err := tree.change_scene_to_file(scene_path)
 	if err != OK:
@@ -166,10 +198,33 @@ func place_player_at_spawn(spawn_id: StringName) -> bool:
 	return true
 
 
-func _fade_to(alpha: float, duration: float) -> void:
+## 0 = clear, 1 = fully covered. Iris centres on the player (or the screen).
+func _fade_to(target: float, duration: float) -> void:
+	var iris := _style == STYLE_IRIS
+	_fade_material.set_shader_parameter(&"iris", iris)
+	if iris:
+		var vp := get_viewport().get_visible_rect().size
+		_fade_material.set_shader_parameter(&"aspect", vp.x / maxf(1.0, vp.y))
+		_fade_material.set_shader_parameter(&"center", _iris_center(vp))
 	if duration <= 0.0:
-		_fade_rect.modulate.a = alpha
+		_set_progress(target)
 		return
 	var tween := create_tween()
-	tween.tween_property(_fade_rect, "modulate:a", alpha, duration)
+	tween.tween_method(_set_progress, get_transition_progress(), target, duration) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	await tween.finished
+
+func _set_progress(value: float) -> void:
+	_fade_material.set_shader_parameter(&"progress", value)
+
+## Current cover amount of the transition overlay (0..1).
+func get_transition_progress() -> float:
+	var value: Variant = _fade_material.get_shader_parameter(&"progress")
+	return float(value) if value != null else 0.0
+
+func _iris_center(viewport_size: Vector2) -> Vector2:
+	var player := get_player()
+	if player and player.is_inside_tree() and viewport_size.x > 0.0:
+		var screen_pos := player.get_global_transform_with_canvas().origin
+		return (screen_pos / viewport_size).clamp(Vector2.ZERO, Vector2.ONE)
+	return Vector2(0.5, 0.5)

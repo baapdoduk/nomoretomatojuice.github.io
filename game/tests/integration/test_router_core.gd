@@ -54,3 +54,14 @@ func test_respawn_without_checkpoint_uses_scene_entry() -> void:
 	assert_false(GameState.has_flag(&"x"), "scene-entry snapshot restored")
 	assert_eq(GameState.health, 5)
 	assert_eq(get_tree().current_scene.name, &"Router_b")
+
+func test_iris_transition_covers_then_clears() -> void:
+	await change_scene_and_wait(A)
+	SceneRouter.change_scene(B, &"from_other", 0.2, SceneRouter.STYLE_IRIS)
+	var peak := [0.0]
+	while SceneRouter.is_transitioning:
+		peak[0] = maxf(peak[0], SceneRouter.get_transition_progress())
+		await get_tree().process_frame
+	assert_almost_eq(peak[0], 1.0, 0.001, "fully covered mid-transition")
+	assert_almost_eq(SceneRouter.get_transition_progress(), 0.0, 0.001, "cleared after")
+	assert_eq(get_tree().current_scene.name, &"Router_b")

@@ -11,6 +11,7 @@ extends Node
 ## Flag values must be JSON-compatible: bool, int, float or String.
 
 signal health_changed(current: int, max_health: int)
+signal coins_changed(total: int)
 signal player_died
 signal item_added(item_id: StringName)
 signal item_removed(item_id: StringName)
@@ -33,6 +34,9 @@ const ASSIST_SUGGEST_DEATHS := 3
 
 var max_health: int = 5
 var health: int = 5
+## Currency collected in levels (part of snapshots: reverts with a death like
+## other non-milestone progress, so respawning coins can't be farmed).
+var coins: int = 0
 ## Last checkpoint snapshot ({} when none). See make_snapshot() for the layout.
 var checkpoint: Dictionary = {}
 ## Snapshot taken by begin_chapter(); used by "restart chapter".
@@ -66,6 +70,8 @@ var _commit_pending := false
 func new_game(starting_max_health: int = 5) -> void:
 	max_health = starting_max_health
 	health = max_health
+	coins = 0
+	coins_changed.emit(coins)
 	_items.clear()
 	_flags.clear()
 	checkpoint = {}
@@ -114,6 +120,16 @@ func refill_health() -> void:
 
 func is_dead() -> bool:
 	return health <= 0
+
+
+# --------------------------------------------------------------------------- coins
+
+func add_coins(amount: int) -> int:
+	if amount == 0:
+		return coins
+	coins = maxi(0, coins + amount)
+	coins_changed.emit(coins)
+	return coins
 
 
 # --------------------------------------------------------------------------- items
@@ -214,6 +230,7 @@ func make_snapshot(scene_path: String, spawn_id: StringName) -> Dictionary:
 		"chapter": String(current_chapter),
 		"health": health,
 		"max_health": max_health,
+		"coins": coins,
 		"items": items,
 		"item_paths": paths,
 		"flags": flags,
@@ -227,6 +244,7 @@ func restore_snapshot(snapshot: Dictionary) -> void:
 		return
 	max_health = int(snapshot.get("max_health", max_health))
 	health = clampi(int(snapshot.get("health", max_health)), 1, max_health)
+	coins = int(snapshot.get("coins", coins))
 	_death_emitted = false
 	_commit_pending = false
 	current_chapter = StringName(String(snapshot.get("chapter", "")))
@@ -245,6 +263,7 @@ func restore_snapshot(snapshot: Dictionary) -> void:
 	for key in flags:
 		_flags[StringName(String(key))] = _normalize_json_value(flags[key])
 	health_changed.emit(health, max_health)
+	coins_changed.emit(coins)
 	inventory_changed.emit()
 	state_restored.emit()
 
@@ -307,6 +326,7 @@ func _flush_commit() -> void:
 		target["item_paths"] = (live["item_paths"] as Dictionary).duplicate(true)
 		target["flags"] = (live["flags"] as Dictionary).duplicate(true)
 		target["max_health"] = max_health
+		target["coins"] = coins
 		target["health"] = clampi(int(target.get("health", max_health)), 1, max_health)
 		if committed.is_empty():
 			committed = target
