@@ -56,6 +56,9 @@ var settings: Dictionary = {
 	## Context actions: replace mash/timed inputs with simple holds.
 	&"assist_context_actions": false,
 	&"autosave_on_checkpoint": false,
+	## Game-feel toggles (accessibility): camera shake and hit-stop freeze frames.
+	&"screen_shake": true,
+	&"hit_stop": true,
 }
 
 var _items: Dictionary = {}      # StringName -> int (count)
