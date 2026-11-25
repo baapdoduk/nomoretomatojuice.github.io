@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1_kr4t8"]
+
+[resource]
+script = ExtResource("1_kr4t8")
+id = &"int_memory"
+display_name = "Faded Ticket"
+description = "A train ticket to a town that no longer exists."
+placeholder_color = Color(1, 0.7, 0.4, 1)
