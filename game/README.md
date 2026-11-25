@@ -51,7 +51,7 @@
 cd game
 ./tools/run_tests.sh            # import → 모든 스크립트/씬 로드 검사 → 전체 테스트 (헤드리스, --fixed-fps 60)
 ./tools/run_tests.sh light      # 파일/메서드 이름 필터
-GODOT=/path/to/godot ./tools/run_tests.sh
+GODOT=/Applications/Godot.app/Contents/MacOS/Godot ./tools/run_tests.sh   # macOS (godot가 PATH에 없을 때)
 ```
 
 - 테스트는 `tests/{unit,integration,smoke}/test_*.gd` (`TestCase` 상속, 외부 의존성 없음). 러너는 Logger로 엔진/스크립트 에러를 수집해 **에러가 난 테스트를 실패 처리**합니다.
