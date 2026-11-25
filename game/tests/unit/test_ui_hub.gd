@@ -18,7 +18,7 @@ func _make_hub(custom_labs: Array[Dictionary] = []) -> Control:
 func test_default_labs_match_files() -> void:
 	var hub := _make_hub()
 	var labs: Array[Dictionary] = hub.get(&"labs")
-	assert_eq(labs.size(), 6, "six labs listed")
+	assert_eq(labs.size(), 7, "seven labs listed")
 	for lab in labs:
 		var button: Button = hub.call(&"get_lab_button", lab.id)
 		assert_not_null(button, "button for %s" % lab.id)

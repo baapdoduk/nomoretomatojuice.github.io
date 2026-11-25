@@ -23,6 +23,8 @@ var labs: Array[Dictionary] = [
 		"description": "Switches, plates, gates, light and mirror puzzles."},
 	{"id": &"integration_overworld", "title": "Integration (overworld)", "path": LAB_DIR + "integration_overworld.tscn",
 		"description": "Everything together: doors, checkpoints, items, puzzles, combat."},
+	{"id": &"cellar_shelf", "title": "Showcase: The Cellar Shelf", "path": "res://scenes/levels/cellar_shelf.tscn",
+		"description": "First showcase level: sticky puddles, dash gaps, drip rhythm, shelf climb, 3 memory shards."},
 ]
 
 var _buttons: Dictionary = {}  # StringName -> Button
