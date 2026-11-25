@@ -6,7 +6,14 @@ extends Node2D
 
 @export var debug_label: Label
 @export var info_label: Label
-@export var show_debug: bool = true
+## Player debug + flag overlays; off by default, F3 toggles it (like the HUD debug corner).
+@export var show_debug: bool = false
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if key and key.pressed and not key.echo and key.physical_keycode == KEY_F3:
+		show_debug = not show_debug
 
 
 func _process(_delta: float) -> void:
@@ -16,7 +23,9 @@ func _process(_delta: float) -> void:
 		if debug_label.visible:
 			debug_label.text = _format_debug(player.get_debug_info())
 	if info_label:
-		info_label.text = _format_info()
+		info_label.visible = show_debug
+		if show_debug:
+			info_label.text = _format_info()
 
 
 func _format_debug(info: Dictionary) -> String:
