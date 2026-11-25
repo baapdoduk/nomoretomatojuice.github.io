@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/light/light_receiver.gd" id="1_moo38"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/puzzle_device_visual.gd" id="2_moa51"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8amtl"]
+radius = 8.0
+
+[node name="LightReceiver" type="Node2D" unique_id=1578904446]
+script = ExtResource("1_moo38")
+
+[node name="Body" type="StaticBody2D" parent="." unique_id=347061953]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body" unique_id=648331467]
+shape = SubResource("CircleShape2D_8amtl")
+
+[node name="Visual" type="Node2D" parent="." unique_id=961277285]
+script = ExtResource("2_moa51")
+color = Color(1, 0.9, 0.5, 1)
