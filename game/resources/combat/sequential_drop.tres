@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AttackPattern" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/attack_pattern.gd" id="1_r77ri"]
+
+[resource]
+script = ExtResource("1_r77ri")
+id = &"sequential_drop"
+display_name = "Sequential Drop"
+radius = 28.0
+tags = Array[StringName]([&"area"])
+repeat_count = 5

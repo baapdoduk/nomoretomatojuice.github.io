@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/attack_area.gd" id="1_apeqw"]
+[ext_resource type="Script" path="res://scripts/combat/hitbox.gd" id="2_qh58m"]
+[ext_resource type="Script" path="res://scripts/combat/telegraph.gd" id="3_ynujc"]
+
+[node name="AttackArea" type="Node2D" unique_id=1300532330]
+script = ExtResource("1_apeqw")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=1853617827]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("2_qh58m")
+
+[node name="Collision" type="CollisionPolygon2D" parent="Hitbox" unique_id=931989236]
+
+[node name="Visual" type="Node2D" parent="." unique_id=1739432650]
+z_index = -1
+script = ExtResource("3_ynujc")
+polygon = PackedVector2Array()

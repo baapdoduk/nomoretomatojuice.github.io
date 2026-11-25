@@ -1,0 +1,92 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/boss.gd" id="1_tjal1"]
+[ext_resource type="Resource" path="res://resources/combat/test_boss.tres" id="2_13k34"]
+[ext_resource type="Script" path="res://scripts/combat/health.gd" id="3_nu2he"]
+[ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="4_e56vq"]
+[ext_resource type="Script" path="res://scripts/combat/hitbox.gd" id="5_8js8i"]
+[ext_resource type="Script" path="res://scripts/combat/attack_runner.gd" id="6_s6exa"]
+[ext_resource type="PackedScene" path="res://scenes/combat/attack_area.tscn" id="7_mlodh"]
+[ext_resource type="PackedScene" path="res://scenes/combat/projectile.tscn" id="8_slbik"]
+[ext_resource type="Script" path="res://scripts/combat/boss_visual.gd" id="9_5emms"]
+[ext_resource type="Script" path="res://scripts/combat/hit_feedback.gd" id="10_0ig1a"]
+[ext_resource type="Script" path="res://scripts/combat/boss_health_bar.gd" id="11_xlltx"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0eb5f"]
+radius = 20.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pk41h"]
+radius = 24.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_nymev"]
+radius = 21.0
+
+[node name="Boss" type="CharacterBody2D" unique_id=2052288927]
+collision_layer = 4
+motion_mode = 1
+script = ExtResource("1_tjal1")
+config = ExtResource("2_13k34")
+
+[node name="Collision" type="CollisionShape2D" parent="." unique_id=189393412]
+shape = SubResource("CircleShape2D_0eb5f")
+
+[node name="Health" type="Node" parent="." unique_id=780070612]
+script = ExtResource("3_nu2he")
+max_health = 12
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=889531423 node_paths=PackedStringArray("health")]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("4_e56vq")
+health = NodePath("../Health")
+
+[node name="Collision" type="CollisionShape2D" parent="Hurtbox" unique_id=976942960]
+shape = SubResource("CircleShape2D_pk41h")
+
+[node name="ContactHitbox" type="Area2D" parent="." unique_id=1199853906]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_8js8i")
+tags = Array[StringName]([&"contact"])
+
+[node name="Collision" type="CollisionShape2D" parent="ContactHitbox" unique_id=2113448596]
+shape = SubResource("CircleShape2D_nymev")
+
+[node name="AttackRunner" type="Node2D" parent="." unique_id=534067688]
+script = ExtResource("6_s6exa")
+attack_area_scene = ExtResource("7_mlodh")
+projectile_scene = ExtResource("8_slbik")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1982395516 node_paths=PackedStringArray("boss")]
+script = ExtResource("9_5emms")
+boss = NodePath("..")
+
+[node name="HurtSound" type="AudioStreamPlayer2D" parent="." unique_id=540442376]
+
+[node name="HitFeedback" type="Node" parent="." unique_id=1838794453 node_paths=PackedStringArray("health", "hitbox", "flash_target", "hurt_sound")]
+script = ExtResource("10_0ig1a")
+health = NodePath("../Health")
+hitbox = NodePath("../ContactHitbox")
+flash_target = NodePath("../Visual")
+flash_blinks = 2
+hurt_sound = NodePath("../HurtSound")
+hurt_rumble = &"hit_confirm"
+
+[node name="HealthBarLayer" type="CanvasLayer" parent="." unique_id=668864661]
+layer = 5
+
+[node name="HealthBar" type="Control" parent="HealthBarLayer" unique_id=862623743 node_paths=PackedStringArray("boss")]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 120.0
+offset_top = 8.0
+offset_right = -120.0
+offset_bottom = 40.0
+script = ExtResource("11_xlltx")
+boss = NodePath("../..")
+
+[node name="Name" type="Label" parent="HealthBarLayer/HealthBar" unique_id=118328925]
+layout_mode = 0
+theme_override_font_sizes/font_size = 10
+text = "Boss"

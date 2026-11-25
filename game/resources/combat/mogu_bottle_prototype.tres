@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="BossConfig" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/boss_phase.gd" id="1_gfpeq"]
+[ext_resource type="Script" path="res://scripts/resources/attack_pattern.gd" id="2_24tqt"]
+[ext_resource type="Resource" path="res://resources/combat/mogu_nata_volley.tres" id="3_f6kvq"]
+[ext_resource type="Resource" path="res://resources/combat/mogu_nata_spiral.tres" id="4_blshc"]
+[ext_resource type="Resource" path="res://resources/combat/mogu_bottle_slam.tres" id="5_hftdg"]
+[ext_resource type="Script" path="res://scripts/resources/boss_config.gd" id="6_8dnks"]
+
+[sub_resource type="Resource" id="Resource_5ko30"]
+script = ExtResource("1_gfpeq")
+phase_name = "PLACEHOLDER - real phase count TBD"
+patterns = Array[ExtResource("2_24tqt")]([ExtResource("3_f6kvq"), ExtResource("4_blshc"), ExtResource("5_hftdg")])
+
+[resource]
+script = ExtResource("6_8dnks")
+id = &"mogu_bottle"
+display_name = "Mogu Bottle (PLACEHOLDER)"
+max_health = 10
+phases = Array[ExtResource("1_gfpeq")]([SubResource("Resource_5ko30")])
+contact_damage = 1
+defeated_flag = &"boss.mogu_bottle.defeated"
+already_defeated = 0

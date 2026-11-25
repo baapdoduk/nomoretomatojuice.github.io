@@ -1,0 +1,66 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/combat/boss.tscn" id="1_boss"]
+[ext_resource type="PackedScene" path="res://scenes/combat/training_dummy.tscn" id="2_dummy"]
+[ext_resource type="Script" path="res://scripts/combat/boss_fight_trigger.gd" id="3_trigger"]
+
+[sub_resource type="RectangleShape2D" id="Rect_h"]
+size = Vector2(640, 16)
+
+[sub_resource type="RectangleShape2D" id="Rect_v"]
+size = Vector2(16, 360)
+
+[sub_resource type="RectangleShape2D" id="Rect_trigger"]
+size = Vector2(120, 24)
+
+[node name="BossArena" type="Node2D"]
+
+[node name="Floor" type="ColorRect" parent="."]
+offset_right = 640.0
+offset_bottom = 360.0
+mouse_filter = 2
+color = Color(0.16, 0.17, 0.2, 1)
+
+[node name="Walls" type="StaticBody2D" parent="."]
+
+[node name="Top" type="CollisionShape2D" parent="Walls"]
+position = Vector2(320, 8)
+shape = SubResource("Rect_h")
+
+[node name="Bottom" type="CollisionShape2D" parent="Walls"]
+position = Vector2(320, 352)
+shape = SubResource("Rect_h")
+
+[node name="Left" type="CollisionShape2D" parent="Walls"]
+position = Vector2(8, 180)
+shape = SubResource("Rect_v")
+
+[node name="Right" type="CollisionShape2D" parent="Walls"]
+position = Vector2(632, 180)
+shape = SubResource("Rect_v")
+
+[node name="WallVisual" type="Line2D" parent="Walls"]
+points = PackedVector2Array(8, 8, 632, 8, 632, 352, 8, 352, 8, 8)
+width = 16.0
+default_color = Color(0.35, 0.36, 0.42, 1)
+
+[node name="Boss" parent="." instance=ExtResource("1_boss")]
+position = Vector2(320, 110)
+wait_for_trigger = true
+
+[node name="TrainingDummy" parent="." instance=ExtResource("2_dummy")]
+position = Vector2(80, 300)
+
+[node name="FightTrigger" type="Area2D" parent="." node_paths=PackedStringArray("boss")]
+position = Vector2(320, 250)
+script = ExtResource("3_trigger")
+boss = NodePath("../Boss")
+
+[node name="Shape" type="CollisionShape2D" parent="FightTrigger"]
+shape = SubResource("Rect_trigger")
+
+[node name="PlayerStart" type="Marker2D" parent="."]
+position = Vector2(320, 320)
+
+[node name="CheckpointPosition" type="Marker2D" parent="."]
+position = Vector2(320, 300)

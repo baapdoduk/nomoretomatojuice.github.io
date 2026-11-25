@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="AttackPattern" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/attack_pattern.gd" id="1_wuhna"]
+
+[resource]
+script = ExtResource("1_wuhna")
+id = &"mogu_nata_spiral"
+display_name = "Nata-de-coco Spiral (placeholder)"
+shape = 2
+line_width = 14.0
+origin = 0
+aim = 2
+aim_step_degrees = 45.0
+active_time = 0.1
+tags = Array[StringName]([&"projectile", &"nata_de_coco"])
+projectile_speed = 200.0
+projectile_count = 2
+projectile_spread_degrees = 12.0
+projectile_lifetime = 1.2
+projectile_radius = 4.0
+repeat_count = 8
+telegraph_color = Color(1, 0.95, 0.6, 1)
+active_color = Color(1, 1, 1, 1)
