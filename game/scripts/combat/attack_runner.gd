@@ -194,13 +194,9 @@ func _on_area_active(area: AttackArea) -> void:
 	active_started.emit(pattern, area.repeat_index)
 
 func _fire_projectiles(origin: Vector2, angle: float) -> void:
-	var count := pattern.projectile_count
-	var spread := deg_to_rad(pattern.projectile_spread_degrees)
 	var scene := pattern.projectile_scene if pattern.projectile_scene else projectile_scene
-	for i in count:
-		var a := angle
-		if count > 1:
-			a = angle - spread * 0.5 + spread * float(i) / float(count - 1)
+	for offset in AttackShape.projectile_angles(pattern):
+		var a := angle + offset
 		var p: Projectile = null
 		if scene:
 			p = scene.instantiate() as Projectile

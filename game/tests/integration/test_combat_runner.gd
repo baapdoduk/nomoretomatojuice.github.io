@@ -149,3 +149,38 @@ func test_cancel_clears_areas_and_projectiles() -> void:
 	runner.cancel()
 	await wait_frames(2)
 	assert_eq(runner.get_child_count(), 0, "projectiles freed by cancel")
+
+func test_projectile_telegraph_lanes_contain_projectile_paths() -> void:
+	for path in ["res://resources/combat/cone_volley.tres", "res://resources/combat/line_shot.tres", "res://resources/combat/mogu_nata_volley.tres"]:
+		var p: AttackPattern = load(path)
+		var runner := make_runner(Vector2(200, 200))
+		runner.rotation = 0.4  # no player: aims along forward rotated by the runner
+		var lanes: Array = []
+		runner.area_spawned.connect(func(a: AttackArea) -> void:
+			for i in a.get_polygons().size():
+				lanes.append(a.get_telegraph_polygon_global(i)))
+		var projectiles: Array[Projectile] = []
+		runner.projectile_spawned.connect(func(pr: Projectile) -> void: projectiles.append(pr))
+		runner.run(p)
+		assert_eq(lanes.size(), p.projectile_count, "one lane per projectile " + path)
+		await wait_until(func() -> bool: return projectiles.size() == p.projectile_count, 5.0)
+		var outside := 0
+		var samples := 0
+		while true:
+			var alive := 0
+			for i in projectiles.size():
+				var pr := projectiles[i]
+				if not is_instance_valid(pr) or pr.is_queued_for_deletion():
+					continue
+				alive += 1
+				samples += 1
+				var r := pr.radius * 0.99
+				for o in [Vector2.ZERO, Vector2(r, 0), Vector2(-r, 0), Vector2(0, r), Vector2(0, -r)]:
+					if not Geometry2D.is_point_in_polygon(pr.global_position + o, lanes[i]):
+						outside += 1
+			if alive == 0:
+				break
+			await wait_physics_frames(1)
+		assert_true(samples > p.projectile_count * 20, "sampled whole flights " + path)
+		assert_eq(outside, 0, "every projectile stays inside its lane " + path)
+		runner.queue_free()

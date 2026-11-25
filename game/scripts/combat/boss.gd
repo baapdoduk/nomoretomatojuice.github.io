@@ -210,7 +210,8 @@ func _on_runner_finished(_pattern: AttackPattern) -> void:
 		_enter_idle()
 
 func _on_health_changed(_current: int, _max: int) -> void:
-	if state == State.DEFEATED or health.is_dead:
+	# A lethal hit goes straight to DEFEATED (no last-moment phase switch / interrupt).
+	if state == State.DEFEATED or health.is_dead or health.current <= 0:
 		return
 	var index := config.get_phase_index_for_ratio(health.get_ratio())
 	if index > phase_index:
