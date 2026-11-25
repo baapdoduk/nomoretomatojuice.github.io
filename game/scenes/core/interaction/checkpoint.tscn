@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/interaction/checkpoint.gd" id="1_foo1a"]
+[ext_resource type="Script" path="res://scripts/core/interaction/spawn_point.gd" id="2_dux0e"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable_visual.gd" id="3_ic3u6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5tp6c"]
+size = Vector2(20, 40)
+
+[node name="Checkpoint" type="Area2D" unique_id=692774175]
+script = ExtResource("1_foo1a")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=901213040]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_5tp6c")
+
+[node name="SpawnPoint" type="Marker2D" parent="." unique_id=269621413]
+script = ExtResource("2_dux0e")
+spawn_id = &"cp_checkpoint"
+
+[node name="Visual" type="Node2D" parent="." unique_id=1002098387]
+position = Vector2(0, -16)
+script = ExtResource("3_ic3u6")
+style = 3
+size = Vector2(12, 32)
+color = Color(0.6, 0.6, 0.65, 1)

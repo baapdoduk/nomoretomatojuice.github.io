@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/level/solid_block.gd" id="1_jlyjg"]
+
+[node name="SolidBlock" type="StaticBody2D" unique_id=353546076]
+collision_mask = 0
+script = ExtResource("1_jlyjg")

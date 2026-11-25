@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1_stx0b"]
+
+[resource]
+script = ExtResource("1_stx0b")
+id = &"lab_memory_photo"
+display_name = "Old Photo"
+description = "A faded photo of a seaside town. Someone wrote 'summer' on the back."

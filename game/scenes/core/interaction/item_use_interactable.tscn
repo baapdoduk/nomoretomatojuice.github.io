@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/interaction/item_use_interactable.gd" id="1_aa8oa"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable_visual.gd" id="2_ieon5"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_abyhg"]
+size = Vector2(28, 28)
+
+[node name="ItemUseInteractable" type="Area2D" unique_id=1311615883]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_aa8oa")
+prompt_text = "Use"
+one_shot = true
+prompt_offset = Vector2(0, -30)
+locked_prompt_text = "Needs an item"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1357293696]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_abyhg")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1826961602]
+position = Vector2(0, -7)
+script = ExtResource("2_ieon5")
+size = Vector2(14, 14)
+color = Color(0.6, 0.6, 0.65, 1)

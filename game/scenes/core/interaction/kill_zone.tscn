@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/interaction/kill_zone.gd" id="1_b3o4h"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable_visual.gd" id="2_7cnn5"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dxdb8"]
+size = Vector2(64, 16)
+
+[node name="KillZone" type="Area2D" unique_id=1162036801]
+script = ExtResource("1_b3o4h")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=612629500]
+shape = SubResource("RectangleShape2D_dxdb8")
+
+[node name="Visual" type="Node2D" parent="." unique_id=669542727]
+script = ExtResource("2_7cnn5")
+size = Vector2(64, 16)
+color = Color(0.85, 0.1, 0.15, 0.45)

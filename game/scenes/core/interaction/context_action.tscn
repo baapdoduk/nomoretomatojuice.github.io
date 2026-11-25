@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/interaction/context_action_interactable.gd" id="1_6ik3i"]
+[ext_resource type="Script" path="res://scripts/core/interaction/context_action_visual.gd" id="2_ihq4m"]
+[ext_resource type="Script" path="res://scripts/core/ui/button_glyph.gd" id="3_qwvmg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p5hak"]
+size = Vector2(32, 32)
+
+[node name="ContextAction" type="Area2D" unique_id=159038518]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_6ik3i")
+prompt_text = "Use"
+lock_movement = true
+prompt_offset = Vector2(0, -34)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1161528341]
+position = Vector2(0, -12)
+shape = SubResource("RectangleShape2D_p5hak")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1363570221]
+position = Vector2(0, -9)
+script = ExtResource("2_ihq4m")
+
+[node name="Glyph" type="Control" parent="Visual" unique_id=1636821149]
+visible = false
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 3
+anchors_preset = 0
+offset_left = -6.0
+offset_top = -33.0
+offset_right = 6.0
+offset_bottom = -21.0
+mouse_filter = 2
+script = ExtResource("3_qwvmg")

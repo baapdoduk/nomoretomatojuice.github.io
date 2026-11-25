@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/interaction/locked_door.gd" id="1_i4sin"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable_visual.gd" id="2_3juc1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6jckw"]
+size = Vector2(56, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p464d"]
+size = Vector2(8, 40)
+
+[node name="LockedDoor" type="Area2D" unique_id=1355252148]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_i4sin")
+prompt_text = "Unlock"
+one_shot = true
+prompt_offset = Vector2(0, -50)
+locked_prompt_text = "Locked"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=684584076]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_6jckw")
+
+[node name="Blocker" type="StaticBody2D" parent="." unique_id=237555699]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Blocker" unique_id=1083218738]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_p464d")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1061376992]
+position = Vector2(0, -20)
+script = ExtResource("2_3juc1")
+style = 1
+size = Vector2(8, 40)
+color = Color(0.85, 0.65, 0.2, 1)

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1_uk2h2"]
+
+[resource]
+script = ExtResource("1_uk2h2")
+id = &"lab_coin"
+display_name = "Coin"
+description = "A stackable test consumable."
+type = 2
+max_stack = 9
+placeholder_color = Color(1, 0.9, 0.2, 1)

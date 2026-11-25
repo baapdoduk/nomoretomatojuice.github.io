@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/ui/interaction_prompt.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/core/ui/button_glyph.gd" id="2"]
+
+[node name="InteractionPrompt" type="Node2D" node_paths=PackedStringArray("glyph", "label")]
+script = ExtResource("1")
+glyph = NodePath("Box/Glyph")
+label = NodePath("Box/Label")
+
+[node name="Box" type="HBoxContainer" parent="."]
+offset_left = -60.0
+offset_top = -8.0
+offset_right = 60.0
+offset_bottom = 6.0
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 3
+
+[node name="Glyph" type="Control" parent="Box"]
+custom_minimum_size = Vector2(13, 13)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("2")
+
+[node name="Label" type="Label" parent="Box"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 9
+text = "Interact"
+vertical_alignment = 1

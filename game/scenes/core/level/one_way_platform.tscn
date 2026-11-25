@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/level/one_way_platform.gd" id="1_03f02"]
+
+[node name="OneWayPlatform" type="StaticBody2D" unique_id=1237169224]
+collision_mask = 0
+script = ExtResource("1_03f02")

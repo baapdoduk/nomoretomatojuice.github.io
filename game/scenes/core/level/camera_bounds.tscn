@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/level/camera_bounds.gd" id="1_rxq1x"]
+
+[node name="CameraBounds" type="Node2D" unique_id=1954286967]
+script = ExtResource("1_rxq1x")

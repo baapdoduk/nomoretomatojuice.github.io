@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1_kgexk"]
+
+[resource]
+script = ExtResource("1_kgexk")
+id = &"lab_memory_garden"
+display_name = "Pressed Flower"
+description = "A flower pressed between two pages. It still smells faintly of rain."
+placeholder_color = Color(1, 0.5, 0.7, 1)

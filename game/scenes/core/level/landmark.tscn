@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/level/landmark.gd" id="1_6810m"]
+
+[node name="Landmark" type="Node2D" unique_id=490775470]
+script = ExtResource("1_6810m")
