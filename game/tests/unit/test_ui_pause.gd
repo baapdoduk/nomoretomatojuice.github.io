@@ -1,6 +1,6 @@
 extends TestCase
 ## PauseMenu (child of the InputFeedback autoload): pause ownership, rumble stop,
-## transitions, settings, disconnect overlay, glyphs and the pad->ui bridge.
+## transitions, settings, disconnect overlay, glyphs and Cross -> ui_accept.
 
 const HUB := "res://scenes/tests/test_hub.tscn"
 const LAB := "res://scenes/tests/controller_lab.tscn"
@@ -31,8 +31,15 @@ func _pause_event(pressed: bool = true) -> InputEventAction:
 	return ev
 
 
+## Pretend pad `device` produced the last input (as InputFeedback reported it last frame).
+func _simulate_pad_in_use(device: int) -> void:
+	menu._last_active_device = device
+	menu._last_input_kind = &"joypad"
+
+
 ## The current scene may be the hub / Controller Lab (which suppress the auto-pause).
 func _allow_disconnect_pause() -> void:
+	_simulate_pad_in_use(0)
 	var scene := get_tree().current_scene
 	if scene and scene.is_in_group(PauseMenu.NO_DISCONNECT_PAUSE_GROUP):
 		scene.remove_from_group(PauseMenu.NO_DISCONNECT_PAUSE_GROUP)
@@ -169,12 +176,28 @@ func test_disconnect_in_suppressed_scene_only_toasts() -> void:
 	var texts: Array[String] = []
 	var cb := func(t: String, _d: float) -> void: texts.append(t)
 	GameState.notification_requested.connect(cb)
+	_simulate_pad_in_use(0)
 	InputFeedback.device_disconnected.emit(0, "Wireless Controller")
 	GameState.notification_requested.disconnect(cb)
 	if not had_group:
 		scene.remove_from_group(PauseMenu.NO_DISCONNECT_PAUSE_GROUP)
 	assert_false(menu.is_open(), "no auto-pause")
 	assert_eq(texts.size(), 1, "toast instead")
+
+
+func test_idle_pad_disconnect_during_keyboard_play_only_toasts() -> void:
+	_allow_disconnect_pause()
+	menu._last_input_kind = &"keyboard"  # pad 0 was active earlier, player now on keyboard
+	var texts: Array[String] = []
+	var cb := func(t: String, _d: float) -> void: texts.append(t)
+	GameState.notification_requested.connect(cb)
+	InputFeedback.device_disconnected.emit(0, "Wireless Controller")
+	_simulate_pad_in_use(1)
+	InputFeedback.device_disconnected.emit(0, "Other Pad")  # a different, idle pad
+	GameState.notification_requested.disconnect(cb)
+	assert_false(menu.is_open(), "no auto-pause")
+	assert_false(get_tree().paused)
+	assert_eq(texts.size(), 2, "toasts only")
 
 
 func test_return_to_hub_hands_pause_to_router() -> void:
@@ -206,6 +229,9 @@ func test_glyph_labels_keyboard_vs_joypad() -> void:
 
 
 func test_pad_cross_activates_focused_button() -> void:
+	var cross := InputEventJoypadButton.new()
+	cross.button_index = JOY_BUTTON_A
+	assert_true(cross.is_action(&"ui_accept"), "ui_accept maps Cross")
 	var button := Button.new()
 	button.focus_mode = Control.FOCUS_ALL
 	add_test_node(button)
@@ -219,5 +245,5 @@ func test_pad_cross_activates_focused_button() -> void:
 		ev.pressed = pressed
 		Input.parse_input_event(ev)
 		await wait_frames(2)
-	assert_eq(hits[0], 1, "Cross bridged to ui_accept")
+	assert_eq(hits[0], 1, "Cross triggers ui_accept via the Input Map")
 	release_all_actions()
