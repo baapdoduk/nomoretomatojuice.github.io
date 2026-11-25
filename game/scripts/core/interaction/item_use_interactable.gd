@@ -23,6 +23,9 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	if success_flag == &"" and consume_required_item and required_item != &"":
+		# A consumed item without persistence would soft-lock after a reload.
+		success_flag = InteractionUtils.derive_flag(self, "success_flag")
 	if success_flag != &"" and GameState.has_flag(success_flag):
 		has_been_used = true
 		_active = true

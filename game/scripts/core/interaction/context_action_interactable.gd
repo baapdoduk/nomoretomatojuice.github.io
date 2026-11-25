@@ -80,6 +80,7 @@ func cancel() -> void:
 	if not is_running:
 		return
 	is_running = false
+	perform_failed = true
 	_set_progress(0.0)
 	cancelled.emit()
 
@@ -103,6 +104,11 @@ func _perform(actor: Node) -> void:
 		if not is_inside_tree() or (actor is Player and (actor as Player).is_dead()):
 			cancel()
 			break
+		if get_tree().paused or not can_process():
+			# Pause menu open: ignore its input and don't tick time_limit; the
+			# first step after resuming ignores just-pressed edges.
+			_first_step = true
+			continue
 		if is_running:
 			_step(get_physics_process_delta_time())
 
@@ -116,6 +122,7 @@ func _step(delta: float) -> void:
 		return
 	if time_limit > 0.0 and elapsed > time_limit:
 		is_running = false
+		perform_failed = true
 		_set_progress(0.0)
 		failed.emit()
 		return

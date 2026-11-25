@@ -7,6 +7,8 @@ extends Area2D
 ## Layer: none, mask: Player.
 
 signal activated
+
+const SPAWN_EPSILON := 2.0
 ## Visual hook: true when this is the active (last saved) checkpoint.
 signal active_changed(active: bool)
 
@@ -18,6 +20,11 @@ signal active_changed(active: bool)
 @export var spawn_point: SpawnPoint
 
 var is_active_checkpoint: bool = false
+
+## True while a player that spawned on our SpawnPoint (respawn / arrival) still
+## overlaps the trigger: that overlap is ignored until the player leaves once.
+var _wait_for_exit: bool = false
+var _had_contact: bool = false
 
 
 func _ready() -> void:
@@ -33,6 +40,7 @@ func _ready() -> void:
 	if spawn_point:
 		spawn_point.spawn_id = get_spawn_id()
 	body_entered.connect(_on_body_entered)
+	body_exited.connect(_on_body_exited)
 	GameState.checkpoint_saved.connect(_on_checkpoint_saved)
 	_set_active(_is_saved_checkpoint(GameState.checkpoint))
 
@@ -52,8 +60,20 @@ func activate() -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if body is Player and not (body as Player).is_dead():
+	if not body is Player or (body as Player).is_dead():
+		return
+	var first := not _had_contact
+	_had_contact = true
+	if first and spawn_point and body.global_position.distance_to(spawn_point.global_position) < SPAWN_EPSILON:
+		_wait_for_exit = true  # spawned here: don't re-save until the player left once
+		return
+	if not _wait_for_exit:
 		activate()
+
+
+func _on_body_exited(body: Node2D) -> void:
+	if body is Player:
+		_wait_for_exit = false
 
 
 func _on_checkpoint_saved(snapshot: Dictionary) -> void:
