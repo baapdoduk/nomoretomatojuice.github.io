@@ -1,0 +1,94 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/player/player.gd" id="1_player"]
+[ext_resource type="Resource" path="res://resources/player/default_player_config.tres" id="2_config"]
+[ext_resource type="Script" path="res://scripts/core/player/side_view_motor.gd" id="3_side"]
+[ext_resource type="Script" path="res://scripts/core/player/top_down_motor.gd" id="4_top"]
+[ext_resource type="Script" path="res://scripts/combat/health.gd" id="5_health"]
+[ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="6_hurtbox"]
+[ext_resource type="Script" path="res://scripts/core/player/player_melee.gd" id="7_melee"]
+[ext_resource type="Script" path="res://scripts/combat/hitbox.gd" id="8_hitbox"]
+[ext_resource type="Script" path="res://scripts/core/player/interactor.gd" id="9_interactor"]
+[ext_resource type="PackedScene" path="res://scenes/core/ui/interaction_prompt.tscn" id="10_prompt"]
+[ext_resource type="Script" path="res://scripts/core/player/player_visual.gd" id="11_visual"]
+
+[sub_resource type="RectangleShape2D" id="Shape_body"]
+size = Vector2(12, 20)
+
+[sub_resource type="RectangleShape2D" id="Shape_hurt"]
+size = Vector2(10, 18)
+
+[sub_resource type="RectangleShape2D" id="Shape_attack"]
+size = Vector2(22, 18)
+
+[sub_resource type="CircleShape2D" id="Shape_interact"]
+radius = 18.0
+
+[node name="Player" type="CharacterBody2D" groups=["player"]]
+collision_layer = 2
+floor_snap_length = 4.0
+script = ExtResource("1_player")
+config = ExtResource("2_config")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("Shape_body")
+
+[node name="SideViewMotor" type="Node" parent="."]
+script = ExtResource("3_side")
+
+[node name="TopDownMotor" type="Node" parent="."]
+script = ExtResource("4_top")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("5_health")
+invulnerability_time = 1.0
+use_game_state = true
+
+[node name="Hurtbox" type="Area2D" parent="." node_paths=PackedStringArray("health")]
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+script = ExtResource("6_hurtbox")
+health = NodePath("../Health")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -10)
+shape = SubResource("Shape_hurt")
+
+[node name="AttackPivot" type="Node2D" parent="." node_paths=PackedStringArray("hitbox")]
+position = Vector2(0, -10)
+script = ExtResource("7_melee")
+hitbox = NodePath("Hitbox")
+
+[node name="Hitbox" type="Area2D" parent="AttackPivot"]
+position = Vector2(16, 0)
+collision_layer = 8
+collision_mask = 4
+monitorable = false
+script = ExtResource("8_hitbox")
+tags = Array[StringName]([&"melee", &"player"])
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackPivot/Hitbox"]
+shape = SubResource("Shape_attack")
+
+[node name="Interactor" type="Area2D" parent="." node_paths=PackedStringArray("prompt")]
+position = Vector2(0, -10)
+collision_layer = 0
+collision_mask = 32
+monitorable = false
+script = ExtResource("9_interactor")
+prompt = NodePath("../InteractionPrompt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Interactor"]
+shape = SubResource("Shape_interact")
+
+[node name="InteractionPrompt" parent="." instance=ExtResource("10_prompt")]
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("11_visual")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, -24)
+position_smoothing_enabled = true
+position_smoothing_speed = 7.0

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1_ponqg"]
+
+[resource]
+script = ExtResource("1_ponqg")
+id = &"lab_key"
+display_name = "Lab Key"
+description = "Opens the locked door in the side-view lab."
+type = 1
+placeholder_color = Color(0.5, 0.9, 1, 1)

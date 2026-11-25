@@ -1,0 +1,218 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/tests/side_view_lab.gd" id="1_4tloa"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/parallax_background.tscn" id="2_lqd3s"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/camera_bounds.tscn" id="3_etcqj"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/solid_block.tscn" id="4_5ju10"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/one_way_platform.tscn" id="5_g340n"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/kill_zone.tscn" id="6_2082x"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/spawn_point.tscn" id="7_2dnno"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/checkpoint.tscn" id="8_impk0"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/scene_door.tscn" id="9_uo2ph"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/popup_interactable.tscn" id="10_n06la"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/pickup.tscn" id="11_8a16p"]
+[ext_resource type="Resource" path="res://resources/items/lab_memory_photo.tres" id="12_h0xdh"]
+[ext_resource type="Resource" path="res://resources/items/lab_key.tres" id="13_to2l3"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/locked_door.tscn" id="14_hjiwb"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/context_action.tscn" id="15_rrbfd"]
+[ext_resource type="PackedScene" path="res://scenes/core/player/player.tscn" id="16_e73jf"]
+
+[node name="SideViewLab" type="Node2D" unique_id=1933187647 node_paths=PackedStringArray("debug_label", "info_label")]
+script = ExtResource("1_4tloa")
+debug_label = NodePath("LabUI/DebugLabel")
+info_label = NodePath("LabUI/InfoLabel")
+
+[node name="Background" parent="." unique_id=364404060 instance=ExtResource("2_lqd3s")]
+
+[node name="CameraBounds" parent="." unique_id=1954286967 instance=ExtResource("3_etcqj")]
+bounds = Rect2(-240, -420, 2720, 500)
+
+[node name="Geometry" type="Node2D" parent="." unique_id=638912993]
+
+[node name="WallLeft" parent="Geometry" unique_id=353546076 instance=ExtResource("4_5ju10")]
+position = Vector2(-240, -420)
+size = Vector2(16, 500)
+
+[node name="FloorStart" parent="Geometry" unique_id=1782476066 instance=ExtResource("4_5ju10")]
+position = Vector2(-224, 0)
+size = Vector2(724, 80)
+
+[node name="SolidPlatform" parent="Geometry" unique_id=1498364496 instance=ExtResource("4_5ju10")]
+position = Vector2(150, -44)
+size = Vector2(64, 12)
+
+[node name="OneWayLow" parent="Geometry" unique_id=1237169224 instance=ExtResource("5_g340n")]
+position = Vector2(290, -52)
+width = 72.0
+
+[node name="OneWayHigh" parent="Geometry" unique_id=1223481545 instance=ExtResource("5_g340n")]
+position = Vector2(380, -100)
+width = 72.0
+
+[node name="FloorMid" parent="Geometry" unique_id=1858844255 instance=ExtResource("4_5ju10")]
+position = Vector2(580, 0)
+size = Vector2(420, 80)
+
+[node name="ShortHopLedge" parent="Geometry" unique_id=1620018214 instance=ExtResource("4_5ju10")]
+position = Vector2(660, -24)
+size = Vector2(48, 24)
+color = Color(0.36, 0.42, 0.36, 1)
+
+[node name="FullJumpLedge" parent="Geometry" unique_id=1385355616 instance=ExtResource("4_5ju10")]
+position = Vector2(800, -64)
+size = Vector2(48, 64)
+color = Color(0.42, 0.36, 0.36, 1)
+
+[node name="FloorEnd" parent="Geometry" unique_id=460165089 instance=ExtResource("4_5ju10")]
+position = Vector2(1160, 0)
+size = Vector2(700, 80)
+
+[node name="KeyPlatform" parent="Geometry" unique_id=115052302 instance=ExtResource("5_g340n")]
+position = Vector2(1400, -64)
+width = 56.0
+
+[node name="DoorLintel" parent="Geometry" unique_id=115296600 instance=ExtResource("4_5ju10")]
+position = Vector2(1810, -420)
+size = Vector2(20, 380)
+
+[node name="FloorExit" parent="Geometry" unique_id=205417893 instance=ExtResource("4_5ju10")]
+position = Vector2(1860, 0)
+size = Vector2(600, 80)
+
+[node name="WallRight" parent="Geometry" unique_id=2070851343 instance=ExtResource("4_5ju10")]
+position = Vector2(2460, -420)
+size = Vector2(16, 500)
+
+[node name="Hazards" type="Node2D" parent="." unique_id=574414274]
+
+[node name="PitCoyote" parent="Hazards" unique_id=1162036801 instance=ExtResource("6_2082x")]
+position = Vector2(540, 60)
+scale = Vector2(1.4, 1)
+
+[node name="PitDash" parent="Hazards" unique_id=1171380679 instance=ExtResource("6_2082x")]
+position = Vector2(1080, 60)
+scale = Vector2(2.6, 1)
+
+[node name="Spawns" type="Node2D" parent="." unique_id=250352235]
+
+[node name="Start" parent="Spawns" unique_id=298611944 instance=ExtResource("7_2dnno")]
+is_default = true
+
+[node name="FromTopDownLab" parent="Spawns" unique_id=1539539718 instance=ExtResource("7_2dnno")]
+position = Vector2(1910, 0)
+spawn_id = &"from_top_down_lab"
+facing = Vector2(-1, 0)
+
+[node name="Interactables" type="Node2D" parent="." unique_id=2052408815]
+
+[node name="CheckpointStart" parent="Interactables" unique_id=692774175 instance=ExtResource("8_impk0")]
+position = Vector2(50, 0)
+checkpoint_id = &"side_start"
+
+[node name="CheckpointMid" parent="Interactables" unique_id=1490017968 instance=ExtResource("8_impk0")]
+position = Vector2(1200, 0)
+checkpoint_id = &"side_mid"
+
+[node name="DoorHub" parent="Interactables" unique_id=2117962565 instance=ExtResource("9_uo2ph")]
+position = Vector2(-150, 0)
+target_scene = "res://scenes/tests/test_hub.tscn"
+prompt_text = "Hub"
+
+[node name="SignWelcome" parent="Interactables" unique_id=1498918262 instance=ExtResource("10_n06la")]
+position = Vector2(110, 0)
+title = "Side-View Lab"
+body = "Run, jump (hold for height, tap for a hop), dash (also in the air, once), attack.
+Coyote ledge, short/full-jump ledges and a dash gap lie ahead. Falling into a pit respawns you at the last checkpoint."
+
+[node name="MemoryPhoto" parent="Interactables" unique_id=1246732478 instance=ExtResource("11_8a16p")]
+position = Vector2(1270, -14)
+item = ExtResource("12_h0xdh")
+
+[node name="Key" parent="Interactables" unique_id=928955350 instance=ExtResource("11_8a16p")]
+position = Vector2(1400, -78)
+item = ExtResource("13_to2l3")
+
+[node name="LockedDoor" parent="Interactables" unique_id=1355252148 instance=ExtResource("14_hjiwb")]
+position = Vector2(1820, 0)
+success_flag = &"lab.side.locked_door.open"
+success_message = "Unlocked"
+required_item = &"lab_key"
+blocked_message = "Locked. The key is somewhere nearby."
+
+[node name="DoorTopDown" parent="Interactables" unique_id=990153267 instance=ExtResource("9_uo2ph")]
+position = Vector2(1960, 0)
+target_scene = "res://scenes/tests/top_down_lab.tscn"
+target_spawn_id = &"from_side_view_lab"
+prompt_text = "To top-down lab"
+
+[node name="SignContext" parent="Interactables" unique_id=964530607 instance=ExtResource("10_n06la")]
+position = Vector2(1450, 0)
+title = "Context actions"
+body = "Each box needs a different input: press, hold, mash, stick direction and trigger depth. No time limit. Cancel with Dash. Enable 'assist_context_actions' to turn mash/trigger into holds."
+
+[node name="CtxPress" parent="Interactables" unique_id=159038518 instance=ExtResource("15_rrbfd")]
+position = Vector2(1510, 0)
+action_type = 0
+action = &"attack"
+success_flag = &"lab.side.ctx_press"
+prompt_text = "Strike (press Attack)"
+
+[node name="CtxHold" parent="Interactables" unique_id=976326168 instance=ExtResource("15_rrbfd")]
+position = Vector2(1570, 0)
+success_flag = &"lab.side.ctx_hold"
+prompt_text = "Hold"
+
+[node name="CtxMash" parent="Interactables" unique_id=1850551586 instance=ExtResource("15_rrbfd")]
+position = Vector2(1630, 0)
+action_type = 2
+success_flag = &"lab.side.ctx_mash"
+prompt_text = "Mash"
+
+[node name="CtxStick" parent="Interactables" unique_id=1068960517 instance=ExtResource("15_rrbfd")]
+position = Vector2(1690, 0)
+action_type = 3
+stick_direction = Vector2(-1, 0)
+success_flag = &"lab.side.ctx_stick"
+prompt_text = "Pull (stick left)"
+
+[node name="CtxTrigger" parent="Interactables" unique_id=1521735507 instance=ExtResource("15_rrbfd")]
+position = Vector2(1750, 0)
+action_type = 4
+action = &"context_right"
+success_flag = &"lab.side.ctx_trigger"
+prompt_text = "Squeeze (R2 / R)"
+
+[node name="Player" parent="." unique_id=1990336169 instance=ExtResource("16_e73jf")]
+
+[node name="LabUI" type="CanvasLayer" parent="." unique_id=1183340720]
+layer = 10
+
+[node name="HelpLabel" type="Label" parent="LabUI" unique_id=1264942784]
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 6.0
+offset_bottom = 4.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "SIDE-VIEW LAB  move: arrows/WASD/L-stick  jump: Space/Cross  dash: Shift/Circle  attack: J/Square  interact: E/Triangle
+Flat run > platforms (solid / one-way: down+jump drops) > coyote gap > short-hop & full-jump ledges > dash gap > checkpoint, memory, key, context actions > locked door > top-down lab"
+
+[node name="InfoLabel" type="Label" parent="LabUI" unique_id=1499852376]
+offset_left = 6.0
+offset_top = 300.0
+offset_right = 6.0
+offset_bottom = 300.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+
+[node name="DebugLabel" type="Label" parent="LabUI" unique_id=469429727]
+offset_left = 470.0
+offset_top = 4.0
+offset_right = 470.0
+offset_bottom = 4.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.7, 1, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3

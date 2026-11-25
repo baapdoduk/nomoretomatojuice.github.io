@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/interaction/popup_interactable.gd" id="1_di7la"]
+[ext_resource type="PackedScene" path="res://scenes/core/ui/popup_panel.tscn" id="2_koldf"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable_visual.gd" id="3_sj5fl"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3jm8t"]
+size = Vector2(28, 28)
+
+[node name="PopupInteractable" type="Area2D" unique_id=1498918262]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_di7la")
+title = "Sign"
+body = "Text goes here."
+popup_scene = ExtResource("2_koldf")
+prompt_text = "Read"
+lock_movement = true
+prompt_offset = Vector2(0, -32)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1111849959]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_3jm8t")
+
+[node name="Visual" type="Node2D" parent="." unique_id=764674328]
+position = Vector2(0, -10)
+script = ExtResource("3_sj5fl")
+style = 4
+size = Vector2(18, 20)
+color = Color(0.75, 0.6, 0.4, 1)

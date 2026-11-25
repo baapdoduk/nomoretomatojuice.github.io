@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/interaction/one_way_door.gd" id="1_vuo43"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable_visual.gd" id="2_dl4is"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ym70b"]
+size = Vector2(56, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_084uw"]
+size = Vector2(8, 40)
+
+[node name="OneWayDoor" type="Area2D" unique_id=1528004920]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_vuo43")
+prompt_text = "Open"
+prompt_offset = Vector2(0, -50)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=340427276]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_ym70b")
+
+[node name="Blocker" type="StaticBody2D" parent="." unique_id=1466325875]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Blocker" unique_id=861838570]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_084uw")
+
+[node name="Visual" type="Node2D" parent="." unique_id=552987996]
+position = Vector2(0, -20)
+script = ExtResource("2_dl4is")
+style = 1
+size = Vector2(8, 40)
+color = Color(0.5, 0.5, 0.75, 1)
+arrow = Vector2(1, 0)

@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[node name="ParallaxBackground" type="Node2D" unique_id=364404060]
+z_index = -20
+
+[node name="Sky" type="Parallax2D" parent="." unique_id=97732493]
+scroll_scale = Vector2(0, 0)
+
+[node name="Visual" type="ColorRect" parent="Sky" unique_id=342229331]
+offset_right = 640.0
+offset_bottom = 360.0
+mouse_filter = 2
+color = Color(0.12, 0.14, 0.22, 1)
+
+[node name="Far" type="Parallax2D" parent="." unique_id=293329177]
+scroll_scale = Vector2(0.2, 0.1)
+repeat_size = Vector2(640, 0)
+repeat_times = 3
+
+[node name="Visual" type="Polygon2D" parent="Far" unique_id=1756471206]
+color = Color(0.18, 0.2, 0.32, 1)
+polygon = PackedVector2Array(0, 360, 0, 123, 80, 60, 160, 123, 240, 60, 320, 123, 400, 60, 480, 123, 560, 60, 640, 123, 640, 360)
+
+[node name="Mid" type="Parallax2D" parent="." unique_id=263428474]
+scroll_scale = Vector2(0.5, 0.3)
+repeat_size = Vector2(640, 0)
+repeat_times = 3
+
+[node name="Visual" type="Polygon2D" parent="Mid" unique_id=1304296711]
+color = Color(0.22, 0.26, 0.36, 1)
+polygon = PackedVector2Array(0, 360, 0, 205, 80, 170, 160, 205, 240, 170, 320, 205, 400, 170, 480, 205, 560, 170, 640, 205, 640, 360)
