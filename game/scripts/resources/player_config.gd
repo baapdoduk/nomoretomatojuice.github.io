@@ -34,6 +34,9 @@ extends Resource
 @export_group("Top Down")
 @export var top_down_accel: float = 2000.0
 @export var top_down_decel: float = 2400.0
+## Snap the move direction to 8 directions (45 degree steps), keeping the analog
+## magnitude (clamped to 1). Diagonal speed equals cardinal speed either way.
+@export var top_down_eight_way: bool = true
 ## Top-down jump is a cosmetic hop (no collision change). Disabled by default.
 @export var top_down_jump_enabled: bool = false
 @export var top_down_jump_duration: float = 0.35

@@ -35,6 +35,8 @@ func _ready() -> void:
 			if child is StaticBody2D:
 				blocker = child
 				break
+	if open_flag == &"":
+		open_flag = InteractionUtils.derive_flag(self, "open_flag")
 	if open_flag != &"" and GameState.has_flag(open_flag):
 		_set_open(true, true)
 

@@ -63,7 +63,7 @@ func test_checkpoint_death_respawn_restores_snapshot() -> void:
 	var key: ItemData = load("res://resources/items/lab_key.tres")
 	GameState.add_item(key)  # before the checkpoint: must survive
 	var cp: Checkpoint = _scene_node(^"Interactables/CheckpointStart")
-	p.global_position = cp.global_position + Vector2(0, -1)
+	p.global_position = cp.global_position + Vector2(6, -1)
 	assert_true(await wait_until(func() -> bool: return cp.is_active_checkpoint, 1.0), "checkpoint touched")
 	assert_eq(String(GameState.checkpoint.get("spawn_id")), "cp_side_start")
 	assert_eq(String(GameState.checkpoint.get("scene_path")), SIDE)

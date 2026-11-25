@@ -16,8 +16,11 @@ signal collected(item: ItemData)
 @export var collected_flag: StringName = &""
 ## Show an InfoPopup with the item's name/description/icon for MEMORY items.
 @export var popup_for_memory: bool = true
-## Toast format; %s = item display name.
-@export var toast_format: String = "Got %s"
+## Optional extra toast; %s = item display name. Empty by default because the
+## HUD already shows "Got: <name>" for every GameState.item_added.
+@export var toast_format: String = ""
+## Toast when a stackable item can't be taken (stack full). The pickup stays.
+@export var full_message: String = "Can't carry more."
 @export var popup_scene: PackedScene
 
 var is_collected: bool = false
@@ -49,12 +52,17 @@ func _can_interact(_actor: Node) -> bool:
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if auto_collect and body is Player and not is_collected and enabled:
+	if auto_collect and body is Player and not (body as Player).is_dead() and not is_collected and enabled:
 		collect(body as Player)
 
 
 func _perform(actor: Node) -> void:
-	await collect(actor as Player)
+	if actor is Player and (actor as Player).is_dead():
+		perform_failed = true
+		return
+	var ok: bool = await collect(actor as Player)
+	if not ok and not is_collected:
+		perform_failed = true
 
 
 ## Collects the item for `player`. Returns true when the inventory changed.
@@ -67,11 +75,15 @@ func collect(player: Player = null) -> bool:
 			GameState.notify(blocked_message)
 		return false
 	var added := GameState.add_item(item)
-	if collected_flag != &"":
-		GameState.set_flag(collected_flag, true)
-	_hide_collected()
 	if not added:
+		# Non-stackable and already owned: this pickup is redundant -> hide.
+		# Stack full: keep the pickup in the world (no flag, no hide).
+		if item.get_stack_limit() == 1 and GameState.has_item(item.id):
+			_mark_collected()
+		elif full_message != "":
+			GameState.notify(full_message)
 		return false
+	_mark_collected()
 	if item.type != ItemData.ItemType.CONSUMABLE:
 		GameState.commit_progress()  # milestone: keys / memories survive a later death
 	var label := item.display_name if item.display_name != "" else String(item.id)
@@ -82,6 +94,12 @@ func collect(player: Player = null) -> bool:
 		var host: Node = get_tree().current_scene if get_tree().current_scene else get_parent()
 		await InfoPopup.show_and_wait(host, label, item.description, item.icon, popup_scene, player)
 	return true
+
+
+func _mark_collected() -> void:
+	if collected_flag != &"":
+		GameState.set_flag(collected_flag, true)
+	_hide_collected()
 
 
 func _hide_collected() -> void:

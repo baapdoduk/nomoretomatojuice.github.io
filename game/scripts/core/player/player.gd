@@ -252,6 +252,11 @@ func apply_knockback(knockback_velocity: Vector2, duration: float) -> void:
 
 func _on_damaged(event: DamageEvent) -> void:
 	melee.cancel()
+	if _dead or GameState.is_dead():
+		# Lethal hit: GameState.player_died already ran _start_death; no knockback.
+		velocity = Vector2.ZERO
+		hurt.emit(event)
+		return
 	var kb := event.knockback
 	if kb == Vector2.ZERO:
 		var from := global_position
@@ -285,6 +290,8 @@ func _start_death() -> void:
 		return
 	_dead = true
 	health.is_dead = true
+	velocity = Vector2.ZERO
+	_stun_left = 0.0
 	melee.cancel()
 	_motor.cancel_dash()
 	add_input_lock(LOCK_DEATH)

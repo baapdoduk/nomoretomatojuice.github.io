@@ -15,7 +15,7 @@ func _can_interact(_actor: Node) -> bool:
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if not body is Player or not enabled or SceneRouter.is_transitioning:
+	if not body is Player or (body as Player).is_dead() or not enabled or SceneRouter.is_transitioning:
 		return
 	if not conditions_met():
 		if blocked_message != "":

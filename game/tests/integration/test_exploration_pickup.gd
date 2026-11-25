@@ -41,7 +41,7 @@ func test_touch_collect_and_duplicate_guard() -> void:
 	assert_eq(got[0], 1)
 	assert_eq(GameState.get_item_count(&"test_key"), 1)
 	assert_false(a.visible, "hidden after collection")
-	assert_true(toasts.has("Got Test Key"), "toast shown: %s" % str(toasts))
+	assert_false(toasts.has("Got Test Key"), "no duplicate pickup toast (HUD shows item_added)")
 	# Same item again (e.g. a duplicate placed elsewhere / scene reload).
 	var b := _pickup(key, Vector2(200, -10))
 	await wait_physics_frames(1)

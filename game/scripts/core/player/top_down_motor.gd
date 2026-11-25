@@ -22,6 +22,8 @@ func physics_update(input: PlayerInputState, delta: float) -> void:
 	var v := player.velocity
 	var stunned := player.is_stunned()
 	var move := Vector2.ZERO if stunned else input.move.limit_length(1.0)
+	if config.top_down_eight_way and move != Vector2.ZERO:
+		move = Vector2.from_angle(snappedf(move.angle(), PI / 4.0)) * move.length()
 
 	if is_dashing():
 		v = _dash_direction * config.dash_speed
