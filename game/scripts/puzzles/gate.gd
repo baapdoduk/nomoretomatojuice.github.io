@@ -44,6 +44,9 @@ signal activated_changed(active: bool)
 ## Size of the auto-created collision shape (when the gate has no shape child).
 @export var gate_size: Vector2 = Vector2(16, 48)
 
+## Extra px around the gate's shapes that must be clear before it closes.
+const CLOSE_CHECK_MARGIN := 2.0
+
 var is_open: bool = false
 ## True while a close is waiting for the gateway to clear.
 var is_close_pending: bool = false
@@ -135,7 +138,7 @@ func _physics_process(_delta: float) -> void:
 	if not is_close_pending:
 		set_physics_process(false)
 		return
-	var blockers := PuzzlePhysics.find_blockers_for_shapes(PuzzlePhysics.space_of(self), _shapes)
+	var blockers := PuzzlePhysics.find_blockers_for_shapes(PuzzlePhysics.space_of(self), _shapes, [], CLOSE_CHECK_MARGIN)
 	if not blockers.is_empty():
 		if not _deferred_reported:
 			_deferred_reported = true
@@ -159,9 +162,13 @@ func _open() -> void:
 	_emit_changed()
 
 
+## Only called from _physics_process right after a clear overlap query: shapes are
+## enabled directly (not deferred) so nothing can step in between check and close.
 func _close() -> void:
 	is_open = false
-	_set_collision(true)
+	for s in _shapes:
+		if is_instance_valid(s):
+			s.set(&"disabled", false)
 	closed.emit()
 	_emit_changed()
 

@@ -106,7 +106,10 @@ func _emit_if_changed() -> void:
 
 
 func _on_interacted(_actor: Node) -> void:
-	# Space queries must run inside a physics frame.
+	# Space queries need a physics frame; physics_frame also fires while the tree
+	# is paused (pause menu / transitions), so hold until gameplay runs again.
 	await get_tree().physics_frame
-	if is_instance_valid(self):
+	while is_instance_valid(self) and is_inside_tree() and get_tree().paused:
+		await get_tree().physics_frame
+	if is_instance_valid(self) and is_inside_tree():
 		request_next()

@@ -8,7 +8,8 @@ extends AnimatableBody2D
 ## the destination overlaps any solid body (walls, other boxes, the player...).
 ## There is no gravity: in side-view maps place boxes on floors and keep their
 ## push lanes level. reset() returns the box to its start position (deferred while
-## a player / pushable stands there), so a box can never be lost or soft-lock a room.
+## the player stands there; other boxes never block it), so a box can never be lost
+## or soft-lock a room.
 ## (AnimatableBody2D = kinematic, so Area2D-based PressurePlates detect it; a
 ## StaticBody2D would not be reported by areas.)
 
@@ -99,6 +100,8 @@ func _physics_process(_delta: float) -> void:
 		set_physics_process(false)
 		return
 	if global_position.is_equal_approx(start_position) or _is_free_at(start_position, true):
+		# Only the player blocks a reset (other boxes never do, so boxes resting on
+		# each other's start cells cannot deadlock a ResetLever).
 		global_position = start_position
 		_pending_reset = false
 		set_physics_process(false)
@@ -116,8 +119,9 @@ func _is_free_at(pos: Vector2, protected_only: bool) -> bool:
 			var local_xform: Transform2D = global_transform.affine_inverse() * (pair[1] as Transform2D)
 			var shape_xform: Transform2D = xform * local_xform
 			if protected_only:
-				if not PuzzlePhysics.find_protected_bodies(space, pair[0], shape_xform, [get_rid()]).is_empty():
-					return false
+				for b in PuzzlePhysics.find_protected_bodies(space, pair[0], shape_xform, [get_rid()]):
+					if b.is_in_group(Layers.GROUP_PLAYER):
+						return false
 			elif _overlaps_solid(space, pair[0], shape_xform):
 				return false
 	return true
@@ -140,6 +144,10 @@ func _on_move_finished() -> void:
 
 func _on_interacted(actor: Node) -> void:
 	var actor_pos: Vector2 = actor.global_position if actor is Node2D else global_position - Vector2.RIGHT
+	# Space queries need a physics frame; physics_frame also fires while the tree
+	# is paused (pause menu / transitions), so hold until gameplay runs again.
 	await get_tree().physics_frame
-	if is_instance_valid(self):
+	while is_instance_valid(self) and is_inside_tree() and get_tree().paused:
+		await get_tree().physics_frame
+	if is_instance_valid(self) and is_inside_tree():
 		push(direction_from(actor_pos))

@@ -200,3 +200,58 @@ func test_mirror_persisted_orientation() -> void:
 	m2.reset()
 	assert_false(GameState.has_flag(&"puzzle.test.mirror"))
 	assert_almost_eq(m2.rotation_degrees, 45.0, 0.01)
+
+
+# ------------------------------------------------------------------ review fixes
+
+func test_non_latching_plate_ignores_stale_persist_flag() -> void:
+	GameState.set_flag(&"puzzle.test.plate", true)
+	var plate := PressurePlate.new()
+	plate.persist_flag = &"puzzle.test.plate"
+	root.add_child(plate)
+	await wait_physics_frames(3)
+	assert_false(plate.is_active(), "nothing on the plate after load")
+	assert_false(GameState.has_flag(&"puzzle.test.plate"), "stale flag corrected")
+	var latched := PressurePlate.new()
+	latched.latch = true
+	latched.persist_flag = &"puzzle.test.plate_latched"
+	GameState.set_flag(&"puzzle.test.plate_latched", true)
+	latched.position = Vector2(300, 0)
+	root.add_child(latched)
+	await wait_physics_frames(3)
+	assert_true(latched.is_active(), "latching plate keeps its flag")
+
+func test_push_box_reset_swapped_boxes_no_deadlock() -> void:
+	var a := PushBox.new()
+	a.position = Vector2(0, 0)
+	root.add_child(a)
+	var b := PushBox.new()
+	b.position = Vector2(64, 0)
+	root.add_child(b)
+	await wait_physics_frames(2)
+	a.global_position = b.start_position
+	b.global_position = a.start_position
+	await wait_physics_frames(2)
+	var lever := ResetLever.new()
+	lever.targets = [a, b]
+	lever.message = ""
+	root.add_child(lever)
+	lever.reset_all()
+	await wait_physics_frames(4)
+	assert_vec_almost_eq(a.global_position, Vector2(0, 0), 0.01, "box A home")
+	assert_vec_almost_eq(b.global_position, Vector2(64, 0), 0.01, "box B home")
+
+func test_push_box_interaction_waits_while_paused() -> void:
+	var box := PushBox.new()
+	box.position = Vector2(100, 0)
+	root.add_child(box)
+	var actor := _player(Vector2(80, 0))
+	await wait_physics_frames(2)
+	get_tree().paused = true
+	box.interactable.interact(actor)
+	await wait_physics_frames(5)
+	assert_false(box.is_moving, "no push while paused")
+	assert_vec_almost_eq(box.global_position, Vector2(100, 0), 0.01)
+	get_tree().paused = false
+	await wait_until(func() -> bool: return box.global_position.x > 115.0 and not box.is_moving, 1.0)
+	assert_vec_almost_eq(box.global_position, Vector2(116, 0), 0.01, "pushed after unpause")

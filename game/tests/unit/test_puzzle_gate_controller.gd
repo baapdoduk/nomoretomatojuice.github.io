@@ -282,3 +282,30 @@ func test_controller_hint_after_delay_when_player_near() -> void:
 	GameState.notification_requested.disconnect(cb)
 	assert_eq(msgs.size(), 1, "hint shown once after delay")
 	assert_eq(msgs[0] if msgs.size() > 0 else "", "Try the mirrors.")
+
+
+func test_gate_close_enables_collision_in_the_same_physics_step() -> void:
+	var a := _dev(true)
+	var g := _gate([a])
+	await _settle()
+	assert_true(g.is_open)
+	var at_close := []
+	g.closed.connect(func() -> void: at_close.append(_shape_disabled(g)))
+	a.set_active(false)
+	await _settle()
+	assert_false(g.is_open)
+	assert_eq(at_close, [false], "solid immediately when closed (no deferred gap)")
+
+func test_gate_close_check_is_inflated() -> void:
+	var a := _dev(true)
+	var g := _gate([a])
+	g.position = Vector2(100, 0)
+	# Gate is 16 px wide (92..108); a 12 px body centred at 115 starts at 109 (1 px gap).
+	var p := _player(Vector2(115, 0))
+	await _settle()
+	a.set_active(false)
+	await _settle()
+	assert_true(g.is_open, "body within the safety margin defers the close")
+	p.position = Vector2(140, 0)
+	await _settle()
+	assert_false(g.is_open)

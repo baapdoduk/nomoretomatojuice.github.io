@@ -16,6 +16,13 @@ var _sources: Array[Node] = []
 
 func _ready() -> void:
 	super._ready()
+	# Non-latching: the state is derived from the world (beam / bodies), so a
+	# persisted "on" is not trusted on load; the first physics frames re-derive it.
+	if not latch and active:
+		active = false
+		if persist_flag != &"":
+			GameState.set_flag(persist_flag, false)
+		_apply_state(false, true)
 	if PuzzlePhysics.find_child_of_type(self, CollisionObject2D) == null:
 		var body := StaticBody2D.new()
 		body.name = "Body"
