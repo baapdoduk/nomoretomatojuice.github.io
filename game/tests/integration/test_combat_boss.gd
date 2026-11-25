@@ -251,3 +251,21 @@ func test_arena_trigger_starts_fight() -> void:
 	assert_true(boss.is_fight_active())
 	await wait_until(func() -> bool: return boss.state == Boss.State.IDLE, 2.0)
 	assert_eq(boss.state, Boss.State.IDLE, "fight started")
+
+func test_lethal_hit_skips_phase_switch() -> void:
+	var a := _spec_pattern()
+	var cfg := make_boss_config([a] as Array[AttackPattern], 0.5)
+	var ph := BossPhase.new()
+	ph.health_threshold = 0.5
+	ph.patterns = [_spec_pattern()] as Array[AttackPattern]
+	ph.interrupt_current_attack = true
+	cfg.phases.append(ph)
+	var boss := spawn_boss(cfg)
+	var phases := record(boss.phase_changed)
+	var states := record(boss.state_changed)
+	await wait_until(func() -> bool: return boss.state == Boss.State.IDLE, 2.0)
+	boss.health.apply_damage(DamageEvent.create(99))
+	assert_eq(phases.size(), 0, "no phase_changed on the lethal hit")
+	assert_eq(boss.phase_index, 0)
+	var seen: Array = states.map(func(e: Array) -> int: return e[0])
+	assert_eq(seen, [Boss.State.DEFEATED], "IDLE -> DEFEATED directly (no interrupt / extra IDLE)")

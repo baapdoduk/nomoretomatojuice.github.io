@@ -62,8 +62,9 @@ enum RepeatTargeting { FOLLOW_TARGET, LOCK_FIRST, STEP_LINE }
 @export var tags: Array[StringName] = []
 
 @export_group("Projectiles")
-## 0 = area attack (the shape itself damages). > 0 = the shape is only a warning
-## and `projectile_count` projectiles are fired from the origin when it activates.
+## 0 = area attack (the Shape group damages). > 0 = projectile attack: `projectile_count`
+## projectiles are fired from the origin when it activates, and the telegraph shows one
+## lane per projectile (speed x lifetime long, 2 x radius wide); the Shape group is unused.
 @export_range(0.0, 4000.0, 1.0, "or_greater") var projectile_speed: float = 0.0
 @export_range(1, 64) var projectile_count: int = 1
 ## Total fan angle (degrees) spread evenly around the aim direction.

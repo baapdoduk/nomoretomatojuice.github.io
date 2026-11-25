@@ -36,6 +36,11 @@ var hitbox: Hitbox
 var collision: CollisionPolygon2D
 var visual: Telegraph
 var _polygon := PackedVector2Array()
+var _polygons: Array[PackedVector2Array] = []
+## Minimum physics frames the Hitbox is active (so active_time 0 still damages).
+const MIN_ACTIVE_TICKS := 1
+var _active_ticks := 0
+var _age_ticks := 0
 
 
 ## Call before adding to the tree.
@@ -45,14 +50,16 @@ func configure(p_pattern: AttackPattern, p_telegraph_time: float, p_source: Node
 	active_time = maxf(0.0, pattern.active_time)
 	deals_damage = not pattern.is_projectile_attack()
 	source = p_source
-	_polygon = AttackShape.build_polygon(pattern)
+	_polygons = AttackShape.build_polygons(pattern)
+	_polygon = _polygons[0] if not _polygons.is_empty() else PackedVector2Array()
 
 
 func _ready() -> void:
 	_ensure_children()
 	if pattern:
 		collision.polygon = _polygon
-		visual.polygon = _polygon
+		collision.disabled = not deals_damage
+		visual.polygons = _polygons
 		visual.telegraph_color = pattern.telegraph_color
 		visual.active_color = pattern.active_color
 		visual.pulse_speed = pattern.pulse_speed
@@ -72,10 +79,15 @@ func _physics_process(delta: float) -> void:
 	if phase == Phase.DONE:
 		return
 	elapsed += delta
+	if phase == Phase.ACTIVE and _active_ticks >= MIN_ACTIVE_TICKS \
+			and elapsed >= telegraph_time + active_time - 0.0001:
+		_finish()
+		return
 	if phase == Phase.TELEGRAPH and elapsed >= telegraph_time - 0.0001:
 		_begin_active()
-	if phase == Phase.ACTIVE and elapsed >= telegraph_time + active_time - 0.0001:
-		_finish()
+	if phase == Phase.ACTIVE and _age_ticks >= 1:
+		_active_ticks += 1
+	_age_ticks += 1
 
 
 func is_active() -> bool:
@@ -86,12 +98,16 @@ func get_telegraph_progress() -> float:
 		return 1.0
 	return clampf(elapsed / telegraph_time, 0.0, 1.0) if telegraph_time > 0.0 else 1.0
 
-## Local polygon shared by telegraph and collision.
+## Local polygon shared by telegraph and collision (area attacks; first lane for projectiles).
 func get_polygon() -> PackedVector2Array:
 	return _polygon
 
-func get_telegraph_polygon_global() -> PackedVector2Array:
-	return visual.global_transform * visual.polygon
+## All local polygons (area: 1; projectile pattern: one lane per projectile).
+func get_polygons() -> Array[PackedVector2Array]:
+	return _polygons
+
+func get_telegraph_polygon_global(index: int = 0) -> PackedVector2Array:
+	return visual.global_transform * visual.polygons[index]
 
 func get_collision_polygon_global() -> PackedVector2Array:
 	return collision.global_transform * collision.polygon
@@ -109,8 +125,8 @@ func _begin_active() -> void:
 	if deals_damage:
 		hitbox.activate()
 	active_started.emit()
-	if active_time <= 0.0:
-		_finish()
+	# active_time 0 still gets one physics frame of damage: _finish() only runs
+	# from _physics_process, after the Hitbox has had its overlap check.
 
 func _finish() -> void:
 	if phase == Phase.DONE:

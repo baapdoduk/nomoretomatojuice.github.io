@@ -6,7 +6,34 @@ extends RefCounted
 ## (damage). Both nodes share the same parent transform, so the warning and the
 ## damage area are identical by construction.
 
-## Local-space polygon (counter-clockwise, no repeated closing point).
+## Every polygon of the attack's warning / hit geometry (local space).
+## Area attacks: [build_polygon()]. Projectile attacks: one lane per projectile
+## covering its whole flight (centre path 0..speed*lifetime, padded by the
+## projectile radius on every side), rotated by its fan angle.
+static func build_polygons(pattern: AttackPattern) -> Array[PackedVector2Array]:
+	var out: Array[PackedVector2Array] = []
+	if pattern == null:
+		return out
+	if not pattern.is_projectile_attack():
+		out.append(build_polygon(pattern))
+		return out
+	var r := pattern.projectile_radius
+	var length := pattern.projectile_speed * pattern.projectile_lifetime
+	var lane := PackedVector2Array([Vector2(-r, -r), Vector2(length + r, -r), Vector2(length + r, r), Vector2(-r, r)])
+	for a in projectile_angles(pattern):
+		out.append(Transform2D(a, Vector2.ZERO) * lane)
+	return out
+
+## Fan angle offsets (radians, relative to the aim) of a projectile pattern.
+static func projectile_angles(pattern: AttackPattern) -> PackedFloat32Array:
+	var out := PackedFloat32Array()
+	var count := maxi(1, pattern.projectile_count)
+	var spread := deg_to_rad(pattern.projectile_spread_degrees)
+	for i in count:
+		out.append(0.0 if count == 1 else -spread * 0.5 + spread * float(i) / float(count - 1))
+	return out
+
+## Local-space polygon of an AREA attack (counter-clockwise, no repeated closing point).
 static func build_polygon(pattern: AttackPattern) -> PackedVector2Array:
 	if pattern == null:
 		return PackedVector2Array()

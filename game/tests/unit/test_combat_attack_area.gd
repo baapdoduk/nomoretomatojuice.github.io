@@ -71,3 +71,19 @@ func test_invulnerable_target_hit_later_in_same_activation() -> void:
 	assert_eq(health.current, 5, "i-frames block")
 	await wait_physics_frames(frames(0.3))
 	assert_eq(health.current, 4, "hit once after i-frames end inside window")
+
+func test_active_time_zero_still_damages_once() -> void:
+	for tele in [0.2, 0.0]:
+		var target := make_target(Vector2(100, 100))
+		var runner := make_runner(Vector2(100, 100))
+		var p := make_pattern()
+		p.origin = AttackPattern.Origin.SELF
+		p.telegraph_time = tele
+		p.active_time = 0.0
+		runner.run(p)
+		await wait_physics_frames(frames(tele) + 6)
+		assert_eq(target_health(target).current, 4, "active_time 0 hits once (telegraph %.1f)" % tele)
+		assert_eq(runner.get_spawned().size(), 0, "area finished")
+		target.queue_free()
+		runner.queue_free()
+		await wait_physics_frames(2)
