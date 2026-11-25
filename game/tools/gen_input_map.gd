@@ -16,6 +16,12 @@ func _key(physical: Key) -> InputEventKey:
 	e.physical_keycode = physical
 	return e
 
+func _keycode(code: Key) -> InputEventKey:
+	var e := InputEventKey.new()
+	e.device = -1
+	e.keycode = code
+	return e
+
 func _btn(index: JoyButton) -> InputEventJoypadButton:
 	var e := InputEventJoypadButton.new()
 	e.device = -1
@@ -42,6 +48,10 @@ func _init() -> void:
 		"context_left": [TRIGGER_DEADZONE, [_key(KEY_Q), _axis(JOY_AXIS_TRIGGER_LEFT, 1.0)]],
 		"context_right": [TRIGGER_DEADZONE, [_key(KEY_R), _axis(JOY_AXIS_TRIGGER_RIGHT, 1.0)]],
 		"pause": [BUTTON_DEADZONE, [_key(KEY_ESCAPE), _btn(JOY_BUTTON_START)]],
+		# Built-in UI actions have no joypad confirm/cancel in Godot 4.7; keep the
+		# engine's default keys and add Cross / Circle for menu navigation.
+		"ui_accept": [BUTTON_DEADZONE, [_keycode(KEY_ENTER), _keycode(KEY_KP_ENTER), _keycode(KEY_SPACE), _btn(JOY_BUTTON_A)]],
+		"ui_cancel": [BUTTON_DEADZONE, [_keycode(KEY_ESCAPE), _btn(JOY_BUTTON_B)]],
 	}
 	for action_name: String in actions:
 		var entry: Array = actions[action_name]
