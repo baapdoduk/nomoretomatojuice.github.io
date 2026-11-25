@@ -1,0 +1,315 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/tests/puzzle_lab.gd" id="1_1h1qq"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/camera_bounds.tscn" id="2_8gmrb"]
+[ext_resource type="Script" path="res://scripts/core/level/camera_bounds.gd" id="3_7ux5l"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/solid_block.tscn" id="4_oeu4x"]
+[ext_resource type="Script" path="res://scripts/core/level/solid_block.gd" id="5_t7rkb"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/spawn_point.tscn" id="6_5apg0"]
+[ext_resource type="Script" path="res://scripts/core/interaction/spawn_point.gd" id="7_s52j1"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/scene_door.tscn" id="8_qcn4a"]
+[ext_resource type="Script" path="res://scripts/core/interaction/scene_door.gd" id="9_wsm6r"]
+[ext_resource type="Script" path="res://scripts/puzzles/state/state_driven.gd" id="10_gsf2y"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/state_lever.tscn" id="11_1k0n5"]
+[ext_resource type="Script" path="res://scripts/puzzles/state/state_lever.gd" id="12_qnkmu"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/state_sensor.tscn" id="13_2qsly"]
+[ext_resource type="Script" path="res://scripts/puzzles/state/state_sensor.gd" id="14_ck7jg"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/gate.tscn" id="15_87wwk"]
+[ext_resource type="Script" path="res://scripts/puzzles/gate.gd" id="16_bchjs"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/reset_lever.tscn" id="17_0q8uu"]
+[ext_resource type="Script" path="res://scripts/puzzles/reset_lever.gd" id="18_3d2k1"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/parallel_world_switch.tscn" id="19_kbpkl"]
+[ext_resource type="Script" path="res://scripts/puzzles/state/parallel_world_switch.gd" id="20_ld6b5"]
+[ext_resource type="PackedScene" path="res://scenes/core/player/player.tscn" id="21_rsinl"]
+[ext_resource type="Script" path="res://scripts/core/player/player.gd" id="22_s00rc"]
+[ext_resource type="Resource" path="res://resources/player/default_player_config.tres" id="23_o16sq"]
+[ext_resource type="PackedScene" path="res://scenes/core/ui/hud.tscn" id="24_fsp6t"]
+[ext_resource type="Script" path="res://scripts/core/ui/hud.gd" id="25_642wb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_njkod"]
+size = Vector2(192, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8p34n"]
+size = Vector2(192, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_saxye"]
+size = Vector2(32, 280)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s4nju"]
+size = Vector2(32, 280)
+
+[node name="PuzzleLabWorld" type="Node2D" unique_id=204973826 node_paths=PackedStringArray("info_label")]
+script = ExtResource("1_1h1qq")
+info_label = NodePath("LabUI/InfoLabel")
+watched_flags = Array[StringName]([&"world.lab.water", &"world.lab.layer"])
+
+[node name="Floor" type="ColorRect" parent="." unique_id=963199398]
+z_index = -10
+offset_right = 960.0
+offset_bottom = 400.0
+mouse_filter = 2
+color = Color(0.14, 0.15, 0.2, 1)
+
+[node name="CameraBounds" type="Node2D" parent="." unique_id=1954286967 instance=ExtResource("2_8gmrb")]
+script = ExtResource("3_7ux5l")
+bounds = Rect2(0, 0, 960, 400)
+
+[node name="OuterWalls" type="Node2D" parent="." unique_id=575434658]
+
+[node name="Top" type="StaticBody2D" parent="OuterWalls" unique_id=353546076 instance=ExtResource("4_oeu4x")]
+collision_mask = 0
+script = ExtResource("5_t7rkb")
+size = Vector2(960, 16)
+
+[node name="Bottom" type="StaticBody2D" parent="OuterWalls" unique_id=1006372960 instance=ExtResource("4_oeu4x")]
+position = Vector2(0, 384)
+collision_mask = 0
+script = ExtResource("5_t7rkb")
+size = Vector2(960, 16)
+
+[node name="Left" type="StaticBody2D" parent="OuterWalls" unique_id=902322191 instance=ExtResource("4_oeu4x")]
+position = Vector2(0, 16)
+collision_mask = 0
+script = ExtResource("5_t7rkb")
+size = Vector2(16, 368)
+
+[node name="Right" type="StaticBody2D" parent="OuterWalls" unique_id=389850442 instance=ExtResource("4_oeu4x")]
+position = Vector2(944, 16)
+collision_mask = 0
+script = ExtResource("5_t7rkb")
+size = Vector2(16, 368)
+
+[node name="SpawnStart" type="Marker2D" parent="." unique_id=298611944 instance=ExtResource("6_5apg0")]
+position = Vector2(60, 340)
+gizmo_extents = 8.0
+script = ExtResource("7_s52j1")
+facing = Vector2(0, 1)
+
+[node name="SpawnFromLab" type="Marker2D" parent="." unique_id=532586736 instance=ExtResource("6_5apg0")]
+position = Vector2(60, 340)
+gizmo_extents = 8.0
+script = ExtResource("7_s52j1")
+spawn_id = &"from_puzzle_lab"
+facing = Vector2(0, 1)
+
+[node name="DoorLab" type="Area2D" parent="." unique_id=2117962565 instance=ExtResource("8_qcn4a")]
+position = Vector2(30, 300)
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("9_wsm6r")
+target_scene = "res://scenes/tests/puzzle_lab.tscn"
+target_spawn_id = &"from_puzzle_lab_world"
+prompt_text = "Back"
+prompt_offset = Vector2(0, -44)
+
+[node name="DoorLbl" type="Label" parent="." unique_id=1996456814]
+offset_left = 18.0
+offset_top = 308.0
+offset_right = 18.0
+offset_bottom = 308.0
+theme_override_font_sizes/font_size = 9
+text = "back"
+
+[node name="SectionF" type="Node2D" parent="." unique_id=2103304327]
+
+[node name="Title" type="Label" parent="SectionF" unique_id=1699617173]
+offset_left = 30.0
+offset_top = 22.0
+offset_right = 30.0
+offset_bottom = 22.0
+theme_override_font_sizes/font_size = 10
+text = "(f) water level lever"
+
+[node name="Water1" type="Node2D" parent="SectionF" unique_id=2024105405]
+position = Vector2(200, 120)
+script = ExtResource("10_gsf2y")
+state_flag = &"world.lab.water"
+active_values = Array[int]([1, 2])
+
+[node name="Solid" type="StaticBody2D" parent="SectionF/Water1" unique_id=168866432]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SectionF/Water1/Solid" unique_id=91901946]
+shape = SubResource("RectangleShape2D_njkod")
+
+[node name="Visual" type="Polygon2D" parent="SectionF/Water1" unique_id=1867746166]
+color = Color(0.3, 0.5, 0.95, 0.8)
+polygon = PackedVector2Array(-96, -32, 96, -32, 96, 32, -96, 32)
+
+[node name="Water2" type="Node2D" parent="SectionF" unique_id=2124811687]
+position = Vector2(200, 200)
+script = ExtResource("10_gsf2y")
+state_flag = &"world.lab.water"
+active_values = Array[int]([2])
+
+[node name="Solid" type="StaticBody2D" parent="SectionF/Water2" unique_id=1086961080]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SectionF/Water2/Solid" unique_id=112052872]
+shape = SubResource("RectangleShape2D_8p34n")
+
+[node name="Visual" type="Polygon2D" parent="SectionF/Water2" unique_id=1440301337]
+color = Color(0.25, 0.4, 0.9, 0.8)
+polygon = PackedVector2Array(-96, -32, 96, -32, 96, 32, -96, 32)
+
+[node name="WLbl" type="Label" parent="SectionF" unique_id=182221475]
+offset_left = 110.0
+offset_top = 76.0
+offset_right = 110.0
+offset_bottom = 76.0
+theme_override_font_sizes/font_size = 8
+text = "water channel (level 1 / level 2)"
+
+[node name="WaterLever" type="Node2D" parent="SectionF" unique_id=680347428 node_paths=PackedStringArray("interactable") instance=ExtResource("11_1k0n5")]
+position = Vector2(84, 150)
+script = ExtResource("12_qnkmu")
+state_flag = &"world.lab.water"
+cycle_values = Array[int]([0, 1, 2])
+interactable = NodePath("Interactable")
+
+[node name="LLbl" type="Label" parent="SectionF" unique_id=1269719900]
+offset_left = 40.0
+offset_top = 162.0
+offset_right = 40.0
+offset_bottom = 162.0
+theme_override_font_sizes/font_size = 8
+text = "lever 0>1>2"
+
+[node name="Level2Sensor" type="Node2D" parent="SectionF" unique_id=1111649018 instance=ExtResource("13_2qsly")]
+position = Vector2(340, 300)
+script = ExtResource("14_ck7jg")
+state_flag = &"world.lab.water"
+active_values = Array[int]([2])
+
+[node name="Sluice" type="StaticBody2D" parent="SectionF" unique_id=89736759 node_paths=PackedStringArray("inputs") instance=ExtResource("15_87wwk")]
+position = Vector2(360, 330)
+script = ExtResource("16_bchjs")
+inputs = [NodePath("../Level2Sensor")]
+
+[node name="SLbl" type="Label" parent="SectionF" unique_id=1442339710]
+offset_left = 310.0
+offset_top = 360.0
+offset_right = 310.0
+offset_bottom = 360.0
+theme_override_font_sizes/font_size = 8
+text = "opens at level 2"
+
+[node name="ResetLever" type="Node2D" parent="SectionF" unique_id=27562687 node_paths=PackedStringArray("targets", "interactable") instance=ExtResource("17_0q8uu")]
+position = Vector2(120, 340)
+script = ExtResource("18_3d2k1")
+targets = [NodePath("../WaterLever")]
+interactable = NodePath("Interactable")
+
+[node name="SectionG" type="Node2D" parent="." unique_id=778676428]
+
+[node name="Divider" type="StaticBody2D" parent="SectionG" unique_id=1073109410 instance=ExtResource("4_oeu4x")]
+position = Vector2(440, 16)
+collision_mask = 0
+script = ExtResource("5_t7rkb")
+size = Vector2(16, 300)
+
+[node name="Title" type="Label" parent="SectionG" unique_id=1002705477]
+offset_left = 470.0
+offset_top = 22.0
+offset_right = 470.0
+offset_bottom = 22.0
+theme_override_font_sizes/font_size = 10
+text = "(g) parallel world (P1)"
+
+[node name="LayerA" type="Node2D" parent="SectionG" unique_id=1685858561]
+position = Vector2(600, 170)
+script = ExtResource("10_gsf2y")
+state_flag = &"world.lab.layer"
+active_values = Array[int]([0])
+inactive_display = 1
+
+[node name="Solid" type="StaticBody2D" parent="SectionG/LayerA" unique_id=2065109183]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SectionG/LayerA/Solid" unique_id=445373680]
+shape = SubResource("RectangleShape2D_saxye")
+
+[node name="Visual" type="Polygon2D" parent="SectionG/LayerA" unique_id=1003102944]
+color = Color(0.8, 0.5, 0.9, 1)
+polygon = PackedVector2Array(-16, -140, 16, -140, 16, 140, -16, 140)
+
+[node name="LayerB" type="Node2D" parent="SectionG" unique_id=485268200]
+position = Vector2(760, 170)
+script = ExtResource("10_gsf2y")
+state_flag = &"world.lab.layer"
+inactive_display = 1
+
+[node name="Solid" type="StaticBody2D" parent="SectionG/LayerB" unique_id=769096149]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SectionG/LayerB/Solid" unique_id=138336125]
+shape = SubResource("RectangleShape2D_s4nju")
+
+[node name="Visual" type="Polygon2D" parent="SectionG/LayerB" unique_id=474881792]
+color = Color(0.5, 0.9, 0.6, 1)
+polygon = PackedVector2Array(-16, -140, 16, -140, 16, 140, -16, 140)
+
+[node name="ALbl" type="Label" parent="SectionG" unique_id=1723750954]
+offset_left = 580.0
+offset_top = 40.0
+offset_right = 580.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 8
+text = "layer A"
+
+[node name="BLbl" type="Label" parent="SectionG" unique_id=145923446]
+offset_left = 740.0
+offset_top = 40.0
+offset_right = 740.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 8
+text = "layer B"
+
+[node name="WorldSwitch" type="Node2D" parent="SectionG" unique_id=182517523 node_paths=PackedStringArray("interactable") instance=ExtResource("19_kbpkl")]
+position = Vector2(740, 330)
+script = ExtResource("20_ld6b5")
+state_flag = &"world.lab.layer"
+blocked_message = "Can't shift here - you would be stuck inside the other world."
+interactable = NodePath("Interactable")
+
+[node name="ResetLever" type="Node2D" parent="SectionG" unique_id=421107947 node_paths=PackedStringArray("targets", "interactable") instance=ExtResource("17_0q8uu")]
+position = Vector2(660, 360)
+script = ExtResource("18_3d2k1")
+targets = [NodePath("../WorldSwitch")]
+interactable = NodePath("Interactable")
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=986552423 groups=["player"] instance=ExtResource("21_rsinl")]
+position = Vector2(60, 340)
+collision_layer = 2
+floor_snap_length = 4.0
+script = ExtResource("22_s00rc")
+movement_mode = 1
+config = ExtResource("23_o16sq")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=17974859 instance=ExtResource("24_fsp6t")]
+process_mode = 3
+layer = 10
+script = ExtResource("25_642wb")
+
+[node name="LabUI" type="CanvasLayer" parent="." unique_id=653663095]
+layer = 5
+
+[node name="HelpLabel" type="Label" parent="LabUI" unique_id=183941100]
+modulate = Color(1, 1, 1, 0.85)
+offset_left = 8.0
+offset_top = 300.0
+offset_right = 8.0
+offset_bottom = 300.0
+theme_override_font_sizes/font_size = 8
+text = "Move: WASD/arrows  Interact: E (Triangle)
+Water lever refuses to flood where you stand.
+World switch refuses if you'd be inside a wall."
+
+[node name="InfoLabel" type="Label" parent="LabUI" unique_id=59733826]
+modulate = Color(0.8, 1, 0.85, 0.9)
+offset_left = 470.0
+offset_top = 40.0
+offset_right = 470.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 8

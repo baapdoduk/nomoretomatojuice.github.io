@@ -1,0 +1,684 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/tests/puzzle_lab.gd" id="1_js0b4"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/camera_bounds.tscn" id="2_d62mx"]
+[ext_resource type="Script" path="res://scripts/core/level/camera_bounds.gd" id="3_qf4sh"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/solid_block.tscn" id="4_go1bt"]
+[ext_resource type="Script" path="res://scripts/core/level/solid_block.gd" id="5_37q3a"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/spawn_point.tscn" id="6_yigao"]
+[ext_resource type="Script" path="res://scripts/core/interaction/spawn_point.gd" id="7_keaun"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/checkpoint.tscn" id="8_5jor4"]
+[ext_resource type="Script" path="res://scripts/core/interaction/checkpoint.gd" id="9_bk06q"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/scene_door.tscn" id="10_23iwm"]
+[ext_resource type="Script" path="res://scripts/core/interaction/scene_door.gd" id="11_1xeif"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/light_emitter.tscn" id="12_ovhaj"]
+[ext_resource type="Script" path="res://scripts/puzzles/light/light_emitter.gd" id="13_ptpeu"]
+[ext_resource type="Resource" path="res://resources/puzzles/default_puzzle_config.tres" id="14_phvqm"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/mirror.tscn" id="15_8tjdi"]
+[ext_resource type="Script" path="res://scripts/puzzles/light/mirror.gd" id="16_v1oc2"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/light_receiver.tscn" id="17_2at2p"]
+[ext_resource type="Script" path="res://scripts/puzzles/light/light_receiver.gd" id="18_e38qi"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/puzzle_controller.tscn" id="19_ms7fg"]
+[ext_resource type="Script" path="res://scripts/puzzles/puzzle_controller.gd" id="20_asou7"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/gate.tscn" id="21_y6rc2"]
+[ext_resource type="Script" path="res://scripts/puzzles/gate.gd" id="22_xxvki"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/reset_lever.tscn" id="23_aut0v"]
+[ext_resource type="Script" path="res://scripts/puzzles/reset_lever.gd" id="24_wrtk8"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/push_box.tscn" id="25_50l44"]
+[ext_resource type="Script" path="res://scripts/puzzles/push_box.gd" id="26_vdqm3"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/switch.tscn" id="27_od42g"]
+[ext_resource type="Script" path="res://scripts/puzzles/puzzle_switch.gd" id="28_2b8en"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/pressure_plate.tscn" id="29_swyg2"]
+[ext_resource type="Script" path="res://scripts/puzzles/pressure_plate.gd" id="30_ifku5"]
+[ext_resource type="Script" path="res://scripts/puzzles/visuals/gate_visual.gd" id="31_bo8hv"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/landmark.tscn" id="32_jrkfv"]
+[ext_resource type="Script" path="res://scripts/core/level/landmark.gd" id="33_e3dvb"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/one_way_door.tscn" id="34_ahe07"]
+[ext_resource type="Script" path="res://scripts/core/interaction/one_way_door.gd" id="35_d1svu"]
+[ext_resource type="PackedScene" path="res://scenes/core/player/player.tscn" id="36_lbt84"]
+[ext_resource type="Script" path="res://scripts/core/player/player.gd" id="37_xlpqc"]
+[ext_resource type="Resource" path="res://resources/player/default_player_config.tres" id="38_tuawn"]
+[ext_resource type="PackedScene" path="res://scenes/core/ui/hud.tscn" id="39_l6mww"]
+[ext_resource type="Script" path="res://scripts/core/ui/hud.gd" id="40_cvc6k"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r2xqw"]
+size = Vector2(16, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3t363"]
+size = Vector2(64, 16)
+
+[node name="PuzzleLab" type="Node2D" unique_id=1092410993 node_paths=PackedStringArray("info_label")]
+script = ExtResource("1_js0b4")
+info_label = NodePath("LabUI/InfoLabel")
+watched_flags = Array[StringName]([&"puzzle.lab_a.solved", &"puzzle.lab_b.solved", &"puzzle.lab_chain.a", &"puzzle.lab_chain.c", &"door.lab_chain_b.open", &"door.lab_shortcut.open"])
+
+[node name="Floor" type="ColorRect" parent="." unique_id=459636358]
+z_index = -10
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+color = Color(0.14, 0.15, 0.2, 1)
+
+[node name="CameraBounds" type="Node2D" parent="." unique_id=1954286967 instance=ExtResource("2_d62mx")]
+script = ExtResource("3_qf4sh")
+bounds = Rect2(0, 0, 1280, 720)
+
+[node name="OuterWalls" type="Node2D" parent="." unique_id=1233173816]
+
+[node name="Top" type="StaticBody2D" parent="OuterWalls" unique_id=353546076 instance=ExtResource("4_go1bt")]
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(1280, 16)
+
+[node name="Bottom" type="StaticBody2D" parent="OuterWalls" unique_id=1189927540 instance=ExtResource("4_go1bt")]
+position = Vector2(0, 704)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(1280, 16)
+
+[node name="Left" type="StaticBody2D" parent="OuterWalls" unique_id=401687779 instance=ExtResource("4_go1bt")]
+position = Vector2(0, 16)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(16, 688)
+
+[node name="Right" type="StaticBody2D" parent="OuterWalls" unique_id=509151270 instance=ExtResource("4_go1bt")]
+position = Vector2(1264, 16)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(16, 688)
+
+[node name="Start" type="Node2D" parent="." unique_id=1867611698]
+
+[node name="Tint" type="ColorRect" parent="Start" unique_id=104637118]
+z_index = -10
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 280.0
+offset_bottom = 704.0
+mouse_filter = 2
+color = Color(0.17, 0.19, 0.17, 1)
+
+[node name="Title" type="Label" parent="Start" unique_id=411466424]
+offset_left = 30.0
+offset_top = 24.0
+offset_right = 30.0
+offset_bottom = 24.0
+theme_override_font_sizes/font_size = 12
+text = "START"
+
+[node name="SpawnStart" type="Marker2D" parent="Start" unique_id=298611944 instance=ExtResource("6_yigao")]
+position = Vector2(160, 560)
+gizmo_extents = 8.0
+script = ExtResource("7_keaun")
+facing = Vector2(0, 1)
+
+[node name="SpawnFromWorld" type="Marker2D" parent="Start" unique_id=1095139943 instance=ExtResource("6_yigao")]
+position = Vector2(80, 270)
+gizmo_extents = 8.0
+script = ExtResource("7_keaun")
+spawn_id = &"from_puzzle_lab_world"
+facing = Vector2(0, 1)
+
+[node name="Checkpoint" type="Area2D" parent="Start" unique_id=692774175 instance=ExtResource("8_5jor4")]
+position = Vector2(220, 560)
+script = ExtResource("9_bk06q")
+checkpoint_id = &"puzzle_lab_start"
+
+[node name="DoorHub" type="Area2D" parent="Start" unique_id=2117962565 instance=ExtResource("10_23iwm")]
+position = Vector2(80, 120)
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("11_1xeif")
+target_scene = "res://scenes/tests/test_hub.tscn"
+target_spawn_id = &"from_puzzle_lab"
+prompt_text = "Hub"
+prompt_offset = Vector2(0, -44)
+
+[node name="HubLbl" type="Label" parent="Start" unique_id=472691669]
+offset_left = 66.0
+offset_top = 128.0
+offset_right = 66.0
+offset_bottom = 128.0
+theme_override_font_sizes/font_size = 9
+text = "Hub"
+
+[node name="DoorWorld" type="Area2D" parent="Start" unique_id=1008604832 instance=ExtResource("10_23iwm")]
+position = Vector2(80, 230)
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("11_1xeif")
+target_scene = "res://scenes/tests/puzzle_lab_world.tscn"
+target_spawn_id = &"from_puzzle_lab"
+prompt_text = "Water / Worlds"
+prompt_offset = Vector2(0, -44)
+
+[node name="WorldLbl" type="Label" parent="Start" unique_id=609465689]
+offset_left = 30.0
+offset_top = 238.0
+offset_right = 30.0
+offset_bottom = 238.0
+theme_override_font_sizes/font_size = 9
+text = "(f) water + (g) worlds"
+
+[node name="SectionA" type="Node2D" parent="." unique_id=267547979]
+
+[node name="Tint" type="ColorRect" parent="SectionA" unique_id=1225731612]
+z_index = -10
+offset_left = 300.0
+offset_top = 16.0
+offset_right = 620.0
+offset_bottom = 286.0
+mouse_filter = 2
+color = Color(0.18, 0.16, 0.22, 1)
+
+[node name="Title" type="Label" parent="SectionA" unique_id=1339180953]
+offset_left = 310.0
+offset_top = 22.0
+offset_right = 310.0
+offset_bottom = 22.0
+theme_override_font_sizes/font_size = 10
+text = "(a) single mirror"
+
+[node name="Emitter" type="Node2D" parent="SectionA" unique_id=1015695831 instance=ExtResource("12_ovhaj")]
+position = Vector2(330, 70)
+script = ExtResource("13_ptpeu")
+config = ExtResource("14_phvqm")
+
+[node name="Mirror" type="StaticBody2D" parent="SectionA" unique_id=1335719069 node_paths=PackedStringArray("interactable") instance=ExtResource("15_8tjdi")]
+position = Vector2(500, 70)
+rotation = -0.7853982
+script = ExtResource("16_v1oc2")
+persist_flag = &"puzzle.lab_a.mirror"
+config = ExtResource("14_phvqm")
+interactable = NodePath("Interactable")
+
+[node name="Receiver" type="Node2D" parent="SectionA" unique_id=1578904446 instance=ExtResource("17_2at2p")]
+position = Vector2(500, 190)
+script = ExtResource("18_e38qi")
+
+[node name="Controller" type="Node2D" parent="SectionA" unique_id=909008091 node_paths=PackedStringArray("devices", "success_player", "flash_targets") instance=ExtResource("19_ms7fg")]
+position = Vector2(560, 190)
+script = ExtResource("20_asou7")
+devices = [NodePath("../Receiver")]
+solved_flag = &"puzzle.lab_a.solved"
+success_player = NodePath("SuccessSound")
+flash_targets = [NodePath("Visual")]
+hint_text = "Rotate the mirror so the beam reaches the receiver."
+config = ExtResource("14_phvqm")
+
+[node name="Door" type="StaticBody2D" parent="SectionA" unique_id=89736759 node_paths=PackedStringArray("inputs") instance=ExtResource("21_y6rc2")]
+position = Vector2(600, 240)
+script = ExtResource("22_xxvki")
+inputs = [NodePath("../Controller")]
+
+[node name="DoorLbl" type="Label" parent="SectionA" unique_id=694280440]
+offset_left = 584.0
+offset_top = 270.0
+offset_right = 584.0
+offset_bottom = 270.0
+theme_override_font_sizes/font_size = 9
+text = "door A"
+
+[node name="ResetLever" type="Node2D" parent="SectionA" unique_id=27562687 node_paths=PackedStringArray("targets", "interactable") instance=ExtResource("23_aut0v")]
+position = Vector2(330, 250)
+script = ExtResource("24_wrtk8")
+targets = [NodePath("../Controller"), NodePath("../Mirror"), NodePath("../Door")]
+interactable = NodePath("Interactable")
+
+[node name="SectionB" type="Node2D" parent="." unique_id=262023283]
+
+[node name="Tint" type="ColorRect" parent="SectionB" unique_id=2081553034]
+z_index = -10
+offset_left = 640.0
+offset_top = 16.0
+offset_right = 960.0
+offset_bottom = 286.0
+mouse_filter = 2
+color = Color(0.16, 0.18, 0.22, 1)
+
+[node name="Title" type="Label" parent="SectionB" unique_id=634879995]
+offset_left = 650.0
+offset_top = 22.0
+offset_right = 650.0
+offset_bottom = 22.0
+theme_override_font_sizes/font_size = 10
+text = "(b) three mirrors + obstacle"
+
+[node name="Emitter" type="Node2D" parent="SectionB" unique_id=1678710452 instance=ExtResource("12_ovhaj")]
+position = Vector2(660, 50)
+script = ExtResource("13_ptpeu")
+config = ExtResource("14_phvqm")
+
+[node name="Mirror1" type="StaticBody2D" parent="SectionB" unique_id=1803376821 node_paths=PackedStringArray("interactable") instance=ExtResource("15_8tjdi")]
+position = Vector2(900, 50)
+rotation = 0.7853982
+script = ExtResource("16_v1oc2")
+config = ExtResource("14_phvqm")
+interactable = NodePath("Interactable")
+
+[node name="Mirror2" type="StaticBody2D" parent="SectionB" unique_id=2093800580 node_paths=PackedStringArray("interactable") instance=ExtResource("15_8tjdi")]
+position = Vector2(900, 220)
+rotation = -0.7853982
+script = ExtResource("16_v1oc2")
+config = ExtResource("14_phvqm")
+interactable = NodePath("Interactable")
+
+[node name="Mirror3" type="StaticBody2D" parent="SectionB" unique_id=770727690 node_paths=PackedStringArray("interactable") instance=ExtResource("15_8tjdi")]
+position = Vector2(720, 220)
+rotation = -0.7853982
+script = ExtResource("16_v1oc2")
+config = ExtResource("14_phvqm")
+interactable = NodePath("Interactable")
+
+[node name="Obstacle" type="AnimatableBody2D" parent="SectionB" unique_id=1970909772 node_paths=PackedStringArray("interactable") instance=ExtResource("25_50l44")]
+position = Vector2(900, 136)
+script = ExtResource("26_vdqm3")
+interactable = NodePath("Interactable")
+
+[node name="Receiver" type="Node2D" parent="SectionB" unique_id=1062170407 instance=ExtResource("17_2at2p")]
+position = Vector2(720, 120)
+script = ExtResource("18_e38qi")
+
+[node name="Controller" type="Node2D" parent="SectionB" unique_id=449738669 node_paths=PackedStringArray("devices", "success_player", "flash_targets") instance=ExtResource("19_ms7fg")]
+position = Vector2(800, 120)
+script = ExtResource("20_asou7")
+devices = [NodePath("../Receiver")]
+solved_flag = &"puzzle.lab_b.solved"
+success_player = NodePath("SuccessSound")
+flash_targets = [NodePath("Visual")]
+config = ExtResource("14_phvqm")
+
+[node name="Door" type="StaticBody2D" parent="SectionB" unique_id=1285731753 node_paths=PackedStringArray("inputs") instance=ExtResource("21_y6rc2")]
+position = Vector2(940, 260)
+script = ExtResource("22_xxvki")
+inputs = [NodePath("../Controller")]
+
+[node name="ResetLever" type="Node2D" parent="SectionB" unique_id=1640906216 node_paths=PackedStringArray("targets", "interactable") instance=ExtResource("23_aut0v")]
+position = Vector2(670, 250)
+script = ExtResource("24_wrtk8")
+targets = [NodePath("../Controller"), NodePath("../Mirror1"), NodePath("../Mirror2"), NodePath("../Mirror3"), NodePath("../Obstacle"), NodePath("../Door")]
+interactable = NodePath("Interactable")
+
+[node name="SectionC" type="Node2D" parent="." unique_id=1677920390]
+
+[node name="Tint" type="ColorRect" parent="SectionC" unique_id=803671424]
+z_index = -10
+offset_left = 980.0
+offset_top = 16.0
+offset_right = 1264.0
+offset_bottom = 286.0
+mouse_filter = 2
+color = Color(0.2, 0.16, 0.16, 1)
+
+[node name="Title" type="Label" parent="SectionC" unique_id=1125547711]
+offset_left = 990.0
+offset_top = 22.0
+offset_right = 990.0
+offset_bottom = 22.0
+theme_override_font_sizes/font_size = 10
+text = "(c) closed loop (safety)"
+
+[node name="Note" type="Label" parent="SectionC" unique_id=1270961368]
+offset_left = 990.0
+offset_top = 240.0
+offset_right = 990.0
+offset_bottom = 240.0
+theme_override_font_sizes/font_size = 8
+text = "beam loops; tracer stops
+on the repeated state"
+
+[node name="Emitter" type="Node2D" parent="SectionC" unique_id=851457586 instance=ExtResource("12_ovhaj")]
+position = Vector2(1080, 70)
+script = ExtResource("13_ptpeu")
+config = ExtResource("14_phvqm")
+
+[node name="Mirror1" type="StaticBody2D" parent="SectionC" unique_id=1314646535 node_paths=PackedStringArray("interactable") instance=ExtResource("15_8tjdi")]
+position = Vector2(1200, 70)
+rotation = 0.7853982
+script = ExtResource("16_v1oc2")
+config = ExtResource("14_phvqm")
+interactable = NodePath("Interactable")
+
+[node name="Mirror2" type="StaticBody2D" parent="SectionC" unique_id=814651013 node_paths=PackedStringArray("interactable") instance=ExtResource("15_8tjdi")]
+position = Vector2(1200, 200)
+rotation = -0.7853982
+script = ExtResource("16_v1oc2")
+config = ExtResource("14_phvqm")
+interactable = NodePath("Interactable")
+
+[node name="Mirror3" type="StaticBody2D" parent="SectionC" unique_id=692915023 node_paths=PackedStringArray("interactable") instance=ExtResource("15_8tjdi")]
+position = Vector2(1040, 200)
+rotation = 0.7853982
+script = ExtResource("16_v1oc2")
+config = ExtResource("14_phvqm")
+interactable = NodePath("Interactable")
+
+[node name="Mirror4" type="StaticBody2D" parent="SectionC" unique_id=1420919962 node_paths=PackedStringArray("interactable") instance=ExtResource("15_8tjdi")]
+position = Vector2(1040, 70)
+rotation = -0.7853982
+script = ExtResource("16_v1oc2")
+config = ExtResource("14_phvqm")
+interactable = NodePath("Interactable")
+
+[node name="ResetLever" type="Node2D" parent="SectionC" unique_id=1324808430 node_paths=PackedStringArray("targets", "interactable") instance=ExtResource("23_aut0v")]
+position = Vector2(1240, 250)
+script = ExtResource("24_wrtk8")
+targets = [NodePath("../Mirror1"), NodePath("../Mirror2"), NodePath("../Mirror3"), NodePath("../Mirror4")]
+interactable = NodePath("Interactable")
+
+[node name="SectionD" type="Node2D" parent="." unique_id=583257516]
+
+[node name="Tint" type="ColorRect" parent="SectionD" unique_id=1944633776]
+z_index = -10
+offset_left = 800.0
+offset_top = 300.0
+offset_right = 1264.0
+offset_bottom = 704.0
+mouse_filter = 2
+color = Color(0.16, 0.2, 0.2, 1)
+
+[node name="Title" type="Label" parent="SectionD" unique_id=56002180]
+offset_left = 810.0
+offset_top = 306.0
+offset_right = 810.0
+offset_bottom = 306.0
+theme_override_font_sizes/font_size = 10
+text = "(d) switches / gates / plate"
+
+[node name="Toggle" type="Node2D" parent="SectionD" unique_id=1424020406 node_paths=PackedStringArray("interactable") instance=ExtResource("27_od42g")]
+position = Vector2(860, 360)
+script = ExtResource("28_2b8en")
+interactable = NodePath("Interactable")
+
+[node name="Momentary" type="Node2D" parent="SectionD" unique_id=934182023 node_paths=PackedStringArray("interactable") instance=ExtResource("27_od42g")]
+position = Vector2(940, 360)
+script = ExtResource("28_2b8en")
+mode = 1
+interactable = NodePath("Interactable")
+
+[node name="Latch" type="Node2D" parent="SectionD" unique_id=1331697765 node_paths=PackedStringArray("interactable") instance=ExtResource("27_od42g")]
+position = Vector2(1020, 360)
+script = ExtResource("28_2b8en")
+mode = 2
+interactable = NodePath("Interactable")
+
+[node name="SwLbl" type="Label" parent="SectionD" unique_id=2048045911]
+offset_left = 840.0
+offset_top = 376.0
+offset_right = 840.0
+offset_bottom = 376.0
+theme_override_font_sizes/font_size = 8
+text = "toggle      momentary     latch"
+
+[node name="GateAND" type="StaticBody2D" parent="SectionD" unique_id=1587880141 node_paths=PackedStringArray("inputs") instance=ExtResource("21_y6rc2")]
+position = Vector2(880, 460)
+script = ExtResource("22_xxvki")
+inputs = [NodePath("../Toggle"), NodePath("../Latch")]
+
+[node name="GateOR" type="StaticBody2D" parent="SectionD" unique_id=1155798740 node_paths=PackedStringArray("inputs") instance=ExtResource("21_y6rc2")]
+position = Vector2(960, 460)
+script = ExtResource("22_xxvki")
+inputs = [NodePath("../Toggle"), NodePath("../Momentary")]
+logic = 1
+
+[node name="GateNOT" type="StaticBody2D" parent="SectionD" unique_id=1743535152 node_paths=PackedStringArray("inputs") instance=ExtResource("21_y6rc2")]
+position = Vector2(1040, 460)
+script = ExtResource("22_xxvki")
+inputs = [NodePath("../Momentary")]
+invert = true
+
+[node name="GLbl" type="Label" parent="SectionD" unique_id=1550194785]
+offset_left = 840.0
+offset_top = 490.0
+offset_right = 840.0
+offset_bottom = 490.0
+theme_override_font_sizes/font_size = 8
+text = "toggle AND latch   toggle OR mom.   NOT mom."
+
+[node name="Plate" type="Node2D" parent="SectionD" unique_id=1600791588 node_paths=PackedStringArray("detector") instance=ExtResource("29_swyg2")]
+position = Vector2(880, 620)
+script = ExtResource("30_ifku5")
+detector = NodePath("Detector")
+
+[node name="Box" type="AnimatableBody2D" parent="SectionD" unique_id=1538802918 node_paths=PackedStringArray("interactable") instance=ExtResource("25_50l44")]
+position = Vector2(928, 620)
+script = ExtResource("26_vdqm3")
+interactable = NodePath("Interactable")
+
+[node name="GatePlate" type="StaticBody2D" parent="SectionD" unique_id=924518335 node_paths=PackedStringArray("inputs") instance=ExtResource("21_y6rc2")]
+position = Vector2(1040, 620)
+script = ExtResource("22_xxvki")
+inputs = [NodePath("../Plate")]
+
+[node name="PLbl" type="Label" parent="SectionD" unique_id=330397150]
+offset_left = 840.0
+offset_top = 650.0
+offset_right = 840.0
+offset_bottom = 650.0
+theme_override_font_sizes/font_size = 8
+text = "plate (push the box onto it) -> gate"
+
+[node name="ResetLever" type="Node2D" parent="SectionD" unique_id=2001985743 node_paths=PackedStringArray("targets", "interactable") instance=ExtResource("23_aut0v")]
+position = Vector2(1220, 660)
+script = ExtResource("24_wrtk8")
+targets = [NodePath("../Toggle"), NodePath("../Momentary"), NodePath("../Latch"), NodePath("../Plate"), NodePath("../Box"), NodePath("../GateAND"), NodePath("../GateOR"), NodePath("../GateNOT"), NodePath("../GatePlate")]
+interactable = NodePath("Interactable")
+
+[node name="SectionE" type="Node2D" parent="." unique_id=2011851004]
+
+[node name="Tint" type="ColorRect" parent="SectionE" unique_id=1674536702]
+z_index = -10
+offset_left = 300.0
+offset_top = 316.0
+offset_right = 760.0
+offset_bottom = 704.0
+mouse_filter = 2
+color = Color(0.2, 0.19, 0.15, 1)
+
+[node name="Title" type="Label" parent="SectionE" unique_id=1877027253]
+offset_left = 470.0
+offset_top = 322.0
+offset_right = 470.0
+offset_bottom = 322.0
+theme_override_font_sizes/font_size = 10
+text = "(e) chain A -> B -> C -> goal"
+
+[node name="Walls" type="Node2D" parent="SectionE" unique_id=1348880631]
+
+[node name="Top" type="StaticBody2D" parent="SectionE/Walls" unique_id=1732439968 instance=ExtResource("4_go1bt")]
+position = Vector2(300, 300)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(476, 16)
+
+[node name="Right" type="StaticBody2D" parent="SectionE/Walls" unique_id=691866444 instance=ExtResource("4_go1bt")]
+position = Vector2(760, 316)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(16, 388)
+
+[node name="DividerTop" type="StaticBody2D" parent="SectionE/Walls" unique_id=601226920 instance=ExtResource("4_go1bt")]
+position = Vector2(600, 316)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(16, 36)
+
+[node name="DividerMid" type="StaticBody2D" parent="SectionE/Walls" unique_id=584113567 instance=ExtResource("4_go1bt")]
+position = Vector2(600, 392)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(16, 248)
+
+[node name="GoalTopL" type="StaticBody2D" parent="SectionE/Walls" unique_id=470406084 instance=ExtResource("4_go1bt")]
+position = Vector2(300, 600)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(40, 16)
+
+[node name="GoalTopR" type="StaticBody2D" parent="SectionE/Walls" unique_id=1004270741 instance=ExtResource("4_go1bt")]
+position = Vector2(404, 600)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(52, 16)
+
+[node name="GoalRight" type="StaticBody2D" parent="SectionE/Walls" unique_id=1972821406 instance=ExtResource("4_go1bt")]
+position = Vector2(440, 616)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(16, 88)
+
+[node name="GoalLeft" type="StaticBody2D" parent="SectionE/Walls" unique_id=1420748465 instance=ExtResource("4_go1bt")]
+position = Vector2(300, 616)
+collision_mask = 0
+script = ExtResource("5_37q3a")
+size = Vector2(16, 88)
+
+[node name="SwitchA" type="Node2D" parent="SectionE" unique_id=1330008107 node_paths=PackedStringArray("interactable") instance=ExtResource("27_od42g")]
+position = Vector2(520, 420)
+script = ExtResource("28_2b8en")
+mode = 2
+interactable = NodePath("Interactable")
+persist_flag = &"puzzle.lab_chain.switch_a"
+
+[node name="ALbl" type="Label" parent="SectionE" unique_id=1439505595]
+offset_left = 516.0
+offset_top = 432.0
+offset_right = 516.0
+offset_bottom = 432.0
+theme_override_font_sizes/font_size = 9
+text = "A"
+
+[node name="ControllerA" type="Node2D" parent="SectionE" unique_id=704898755 node_paths=PackedStringArray("devices", "success_player", "flash_targets") instance=ExtResource("19_ms7fg")]
+position = Vector2(560, 420)
+script = ExtResource("20_asou7")
+devices = [NodePath("../SwitchA")]
+solved_flag = &"puzzle.lab_chain.a"
+success_player = NodePath("SuccessSound")
+flash_targets = [NodePath("Visual")]
+config = ExtResource("14_phvqm")
+
+[node name="PassageB" type="StaticBody2D" parent="SectionE" unique_id=16629913 node_paths=PackedStringArray("inputs")]
+position = Vector2(608, 672)
+script = ExtResource("22_xxvki")
+inputs = [NodePath("../ControllerA")]
+open_flag = &"door.lab_chain_b.open"
+gate_size = Vector2(16, 64)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SectionE/PassageB" unique_id=1914827204]
+shape = SubResource("RectangleShape2D_r2xqw")
+
+[node name="Visual" type="Node2D" parent="SectionE/PassageB" unique_id=196789299]
+script = ExtResource("31_bo8hv")
+size = Vector2(16, 64)
+
+[node name="BLbl" type="Label" parent="SectionE" unique_id=1994895481]
+offset_left = 620.0
+offset_top = 690.0
+offset_right = 620.0
+offset_bottom = 690.0
+theme_override_font_sizes/font_size = 9
+text = "B"
+
+[node name="SwitchC" type="Node2D" parent="SectionE" unique_id=1671181255 node_paths=PackedStringArray("interactable") instance=ExtResource("27_od42g")]
+position = Vector2(690, 520)
+script = ExtResource("28_2b8en")
+mode = 2
+interactable = NodePath("Interactable")
+persist_flag = &"puzzle.lab_chain.switch_c"
+
+[node name="CLbl" type="Label" parent="SectionE" unique_id=1003584882]
+offset_left = 686.0
+offset_top = 532.0
+offset_right = 686.0
+offset_bottom = 532.0
+theme_override_font_sizes/font_size = 9
+text = "C"
+
+[node name="ControllerC" type="Node2D" parent="SectionE" unique_id=1001122846 node_paths=PackedStringArray("devices", "success_player", "flash_targets") instance=ExtResource("19_ms7fg")]
+position = Vector2(690, 460)
+script = ExtResource("20_asou7")
+devices = [NodePath("../ControllerA"), NodePath("../SwitchC")]
+solved_flag = &"puzzle.lab_chain.c"
+success_player = NodePath("SuccessSound")
+flash_targets = [NodePath("Visual")]
+config = ExtResource("14_phvqm")
+
+[node name="FinalDoor" type="StaticBody2D" parent="SectionE" unique_id=1307828669 node_paths=PackedStringArray("inputs")]
+position = Vector2(372, 608)
+script = ExtResource("22_xxvki")
+inputs = [NodePath("../ControllerC")]
+gate_size = Vector2(64, 16)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SectionE/FinalDoor" unique_id=1950895307]
+shape = SubResource("RectangleShape2D_3t363")
+
+[node name="Visual" type="Node2D" parent="SectionE/FinalDoor" unique_id=651124424]
+script = ExtResource("31_bo8hv")
+size = Vector2(64, 16)
+
+[node name="Goal" type="Node2D" parent="SectionE" unique_id=490775470 instance=ExtResource("32_jrkfv")]
+position = Vector2(372, 696)
+script = ExtResource("33_e3dvb")
+height = 64.0
+
+[node name="Shortcut" type="Area2D" parent="SectionE" unique_id=1528004920 instance=ExtResource("34_ahe07")]
+position = Vector2(608, 392)
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("35_d1svu")
+open_flag = &"door.lab_shortcut.open"
+prompt_text = "Open"
+prompt_offset = Vector2(0, -50)
+
+[node name="SCLbl" type="Label" parent="SectionE" unique_id=722417134]
+offset_left = 470.0
+offset_top = 356.0
+offset_right = 470.0
+offset_bottom = 356.0
+theme_override_font_sizes/font_size = 8
+text = "shortcut (opens from the right)"
+
+[node name="ResetLever" type="Node2D" parent="SectionE" unique_id=640854448 node_paths=PackedStringArray("targets", "interactable") instance=ExtResource("23_aut0v")]
+position = Vector2(330, 340)
+script = ExtResource("24_wrtk8")
+targets = [NodePath("../ControllerC"), NodePath("../PassageB"), NodePath("../FinalDoor")]
+interactable = NodePath("Interactable")
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=2008684397 groups=["player"] instance=ExtResource("36_lbt84")]
+position = Vector2(160, 560)
+collision_layer = 2
+floor_snap_length = 4.0
+script = ExtResource("37_xlpqc")
+movement_mode = 1
+config = ExtResource("38_tuawn")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=271842185 instance=ExtResource("39_l6mww")]
+process_mode = 3
+layer = 10
+script = ExtResource("40_cvc6k")
+
+[node name="LabUI" type="CanvasLayer" parent="." unique_id=530478685]
+layer = 5
+
+[node name="HelpLabel" type="Label" parent="LabUI" unique_id=993882337]
+modulate = Color(1, 1, 1, 0.85)
+offset_left = 8.0
+offset_top = 300.0
+offset_right = 8.0
+offset_bottom = 300.0
+theme_override_font_sizes/font_size = 8
+text = "Move: WASD/arrows  Interact: E (Triangle)
+Rotate mirrors, pull levers, push boxes.
+Each section has a red reset lever."
+
+[node name="InfoLabel" type="Label" parent="LabUI" unique_id=317293425]
+modulate = Color(0.8, 1, 0.85, 0.9)
+offset_left = 470.0
+offset_top = 40.0
+offset_right = 470.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 8
