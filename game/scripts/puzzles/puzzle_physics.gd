@@ -56,8 +56,9 @@ static func shapes_of(node: Node) -> Array:
 	return out
 
 ## Bodies in PROTECTED_GROUPS overlapping `shape` at `xform`. `exclude` = RIDs to ignore.
+## `margin` inflates the query shape (px) for a safety gap.
 static func find_protected_bodies(space: PhysicsDirectSpaceState2D, shape: Shape2D, xform: Transform2D,
-		exclude: Array[RID] = []) -> Array[Node]:
+		exclude: Array[RID] = [], margin: float = 0.0) -> Array[Node]:
 	var out: Array[Node] = []
 	if space == null or shape == null:
 		return out
@@ -68,6 +69,7 @@ static func find_protected_bodies(space: PhysicsDirectSpaceState2D, shape: Shape
 	params.collide_with_bodies = true
 	params.collide_with_areas = false
 	params.exclude = exclude
+	params.margin = margin
 	for hit in space.intersect_shape(params, 32):
 		var body: Object = hit.get("collider")
 		if body is Node and is_protected(body) and not out.has(body):
@@ -77,7 +79,7 @@ static func find_protected_bodies(space: PhysicsDirectSpaceState2D, shape: Shape
 ## Protected bodies that would overlap any of `shape_nodes` if they were enabled.
 ## The shapes' own bodies are excluded from the query.
 static func find_blockers_for_shapes(space: PhysicsDirectSpaceState2D, shape_nodes: Array[Node],
-		exclude: Array[RID] = []) -> Array[Node]:
+		exclude: Array[RID] = [], margin: float = 0.0) -> Array[Node]:
 	var out: Array[Node] = []
 	for node in shape_nodes:
 		if not is_instance_valid(node):
@@ -87,7 +89,7 @@ static func find_blockers_for_shapes(space: PhysicsDirectSpaceState2D, shape_nod
 		if body:
 			ex.append(body.get_rid())
 		for pair: Array in shapes_of(node):
-			for b in find_protected_bodies(space, pair[0], pair[1], ex):
+			for b in find_protected_bodies(space, pair[0], pair[1], ex, margin):
 				if not out.has(b):
 					out.append(b)
 	return out

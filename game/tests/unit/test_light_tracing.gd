@@ -227,3 +227,30 @@ func test_beam_visual_follows_points() -> void:
 	assert_not_null(beam, "auto-created beam line")
 	assert_eq(beam.points.size(), 2)
 	assert_almost_eq(beam.points[0].x, 0.0, 0.01, "local coordinates")
+
+
+func test_non_latching_receiver_resyncs_after_load() -> void:
+	GameState.set_flag(&"puzzle.test.recv", true)
+	var r := LightReceiver.new()
+	r.persist_flag = &"puzzle.test.recv"
+	r.position = Vector2(100, 0)
+	root.add_child(r)
+	var g := Gate.new()
+	g.inputs = [r]
+	g.position = Vector2(0, 200)
+	root.add_child(g)
+	await _settle()
+	assert_false(r.is_active(), "no beam -> not active despite stale flag")
+	assert_false(g.is_open, "gate not opened by a stale flag")
+	_emitter(Vector2(0, 0))
+	await _settle()
+	assert_true(r.is_active(), "re-derived from the beam")
+	assert_true(GameState.has_flag(&"puzzle.test.recv"))
+	GameState.set_flag(&"puzzle.test.recv_latched", true)
+	var rl := LightReceiver.new()
+	rl.latch = true
+	rl.persist_flag = &"puzzle.test.recv_latched"
+	rl.position = Vector2(0, 300)
+	root.add_child(rl)
+	await _settle()
+	assert_true(rl.is_active(), "latching receiver keeps its flag")
