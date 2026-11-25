@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/player/player.gd" id="1_player"]
 [ext_resource type="Resource" path="res://resources/player/default_player_config.tres" id="2_config"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" path="res://scripts/core/player/interactor.gd" id="9_interactor"]
 [ext_resource type="PackedScene" path="res://scenes/core/ui/interaction_prompt.tscn" id="10_prompt"]
 [ext_resource type="Script" path="res://scripts/core/player/player_visual.gd" id="11_visual"]
+[ext_resource type="Script" path="res://scripts/core/level/platformer_camera.gd" id="12_pcam"]
 
 [sub_resource type="RectangleShape2D" id="Shape_body"]
 size = Vector2(12, 20)
@@ -92,3 +93,9 @@ script = ExtResource("11_visual")
 position = Vector2(0, -24)
 position_smoothing_enabled = true
 position_smoothing_speed = 7.0
+
+[node name="PlatformerCamera" type="Camera2D" parent="."]
+top_level = true
+enabled = false
+process_callback = 0
+script = ExtResource("12_pcam")

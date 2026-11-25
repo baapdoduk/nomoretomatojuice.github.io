@@ -21,7 +21,7 @@ func test_jump_apex_matches_formula() -> void:
 	var cfg := p.config
 	var expected := cfg.jump_velocity * cfg.jump_velocity / (2.0 * cfg.gravity)
 	var h := await _measure_jump_height(p, 999)
-	assert_almost_eq(h, expected, 5.0, "apex ~ v^2/2g (73.5 px)")
+	assert_almost_eq(h, expected, 5.0, "apex ~ v^2/2g (76 px; apex hang adds < 1 px)")
 	assert_true(p.is_on_floor(), "landed again")
 
 
@@ -41,6 +41,7 @@ func _setup_ledge() -> Array:
 	var jumps := [0]
 	p.jumped.connect(func() -> void: jumps[0] += 1)
 	await wait_physics_frames(3)
+	await wait_until(func() -> bool: return p.is_on_floor(), 1.0)
 	input.move = Vector2.RIGHT
 	var left := await wait_until(func() -> bool: return not p.is_on_floor(), 2.0)
 	assert_true(left, "walked off the ledge")
@@ -74,8 +75,12 @@ func _drop_and_press(press_before_landing: float) -> int:
 	var jumps := [0]
 	p.jumped.connect(func() -> void: jumps[0] += 1)
 	var cfg := p.config
-	# Fall time from rest: t = sqrt(2h/g). Press `press_before_landing` s earlier.
-	var fall_time := sqrt(2.0 * 150.0 / cfg.gravity)
+	# Fall time from rest with fall gravity + max fall speed (retuned config).
+	# Press `press_before_landing` s earlier.
+	var gf := cfg.gravity * cfg.fall_gravity_multiplier
+	var d_cap := cfg.max_fall_speed * cfg.max_fall_speed / (2.0 * gf)
+	var fall_time := sqrt(2.0 * 150.0 / gf) if 150.0 <= d_cap \
+			else cfg.max_fall_speed / gf + (150.0 - d_cap) / cfg.max_fall_speed
 	var press_frame := int(round((fall_time - press_before_landing) * 60.0))
 	await wait_physics_frames(press_frame)
 	assert_false(p.is_on_floor(), "still airborne when pressing")

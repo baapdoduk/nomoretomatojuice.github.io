@@ -7,21 +7,38 @@ extends Resource
 
 @export_group("Movement")
 ## Max horizontal (side view) / planar (top down) walking speed, px/s.
+## (Spec default 180; documented alternative 160 for tighter levels.)
 @export var move_speed: float = 180.0
-@export var ground_accel: float = 1800.0
-@export var ground_decel: float = 2200.0
+## Side view: ground acceleration toward the input direction, px/s^2.
+@export var ground_accel: float = 900.0
+## Side view: ground deceleration with no input, px/s^2.
+@export var ground_decel: float = 1200.0
+## Side view: ground deceleration while the input opposes the velocity (turning), px/s^2.
+@export var ground_turn_decel: float = 2200.0
 @export var air_accel: float = 1200.0
 @export var air_decel: float = 900.0
 
 @export_group("Side View")
-@export var gravity: float = 1200.0
+## Rising gravity, px/s^2. Tuned with jump_velocity for apex ~4.75 tiles / airtime ~0.8 s.
+@export var gravity: float = 900.0
 ## Extra gravity multiplier while falling (1.0 = symmetric arc).
-@export var fall_gravity_multiplier: float = 1.0
-@export var max_fall_speed: float = 600.0
-## Initial upward velocity of a full jump. Apex height = v^2 / (2 * gravity).
-@export var jump_velocity: float = 420.0
+@export var fall_gravity_multiplier: float = 1.4
+@export var max_fall_speed: float = 320.0
+## Initial upward velocity of a full jump. Apex height ~= v^2 / (2 * gravity)
+## (the apex hang adds < 1 px).
+@export var jump_velocity: float = 370.0
 ## Upward velocity is multiplied by this when jump is released early (variable height).
-@export_range(0.0, 1.0) var jump_cut_multiplier: float = 0.4
+@export_range(0.0, 1.0) var jump_cut_multiplier: float = 0.5
+## Gravity multiplier near the apex (|vy| < apex_hang_speed) while jump is held.
+@export_range(0.0, 1.0) var apex_hang_multiplier: float = 0.6
+## Vertical speed below which the apex hang applies, px/s.
+@export var apex_hang_speed: float = 40.0
+## Max horizontal nudge (px) that lets a rising jump slip past a ceiling corner.
+@export var corner_correction: float = 4.0
+## Max height (px) of a lip the player walks up without jumping.
+@export var step_up_height: float = 3.0
+## Min |velocity.x| at which reversing on the ground emits Player.skidded.
+@export var skid_min_speed: float = 100.0
 ## Seconds after leaving a ledge during which a jump is still accepted.
 @export var coyote_time: float = 0.12
 ## Seconds a jump press is remembered before landing.
@@ -57,6 +74,16 @@ extends Resource
 @export var attack_size: Vector2 = Vector2(22, 18)
 @export var attack_damage: int = 1
 @export var attack_knockback: float = 200.0
+
+@export_group("Feel")
+## Hit-stop length on confirmed melee hits (real seconds). Setting "hit_stop" toggles it.
+@export var hit_stop_duration: float = 0.05
+## Engine.time_scale during hit-stop.
+@export_range(0.0, 1.0) var hit_stop_time_scale: float = 0.05
+## Camera trauma added on confirmed melee hits (setting "screen_shake" toggles it).
+@export_range(0.0, 1.0) var hit_trauma: float = 0.25
+## Camera trauma added when the player takes damage.
+@export_range(0.0, 1.0) var hurt_trauma: float = 0.4
 
 @export_group("Hurt")
 ## Seconds of invulnerability after taking damage (Health.invulnerability_time).

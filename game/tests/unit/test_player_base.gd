@@ -50,6 +50,8 @@ func make_side_player_on_floor(x: float = 0.0, config: PlayerConfig = null) -> P
 	make_block(Rect2(-2000, 0, 4000, 40))
 	var p := make_player(Player.MovementMode.SIDE_VIEW, Vector2(x, -1), config)
 	await wait_physics_frames(3)
+	# Lower retuned gravity: the 1 px drop can take a few more frames.
+	await wait_until(func() -> bool: return p.is_on_floor(), 1.0)
 	return p
 
 
@@ -121,3 +123,16 @@ func release_jump() -> void:
 
 func press_dash() -> void:
 	input.dash_pressed = true
+
+
+## Disables hit-stop / screen shake for tests that need exact timing.
+## Undo with restore_feel_settings() (GameState.new_game keeps settings).
+func disable_feel_settings() -> void:
+	GameState.set_setting(&"hit_stop", false)
+	GameState.set_setting(&"screen_shake", false)
+
+
+func restore_feel_settings() -> void:
+	GameState.settings.erase(&"hit_stop")
+	GameState.settings.erase(&"screen_shake")
+	HitStop.stop()

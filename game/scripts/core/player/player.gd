@@ -1,13 +1,17 @@
 class_name Player
 extends CharacterBody2D
 ## The player character. One shared component set (Health, Hurtbox, melee,
-## Interactor, prompt, Visual, Camera2D) + two movement motors; only the motor
+## Interactor, prompt, Visual, cameras) + two movement motors; only the motor
 ## selected by `movement_mode` runs. Movement physics lives in the motors;
 ## facing, input locks, hurt/knockback, attack and death live here.
 ##
 ## Scene: res://scenes/core/player/player.tscn (group "player").
 ## Presentation nodes (Visual, SFX) subscribe to the signals below; the logic
 ## never depends on them.
+##
+## Cameras: SIDE_VIEW uses the `PlatformerCamera` child (top_level rig with
+## lead / platform snap / shake); TOP_DOWN uses the plain smoothed `Camera2D`
+## child. `camera` always points at the active one.
 
 ## Emitted when the derived presentation state changes:
 ## &"idle", &"run", &"jump", &"fall", &"dash", &"attack", &"hurt", &"dead".
@@ -15,6 +19,8 @@ signal state_changed(state: StringName)
 signal facing_changed(facing: Vector2)
 signal jumped
 signal landed
+## Side view: reversing direction on the ground at speed (dust / sfx cue).
+signal skidded
 signal dashed(direction: Vector2)
 signal attacked(direction: Vector2)
 signal hurt(event: DamageEvent)
@@ -37,7 +43,7 @@ const CAMERA_BOUNDS_GROUP := &"camera_bounds"
 @export var movement_mode: MovementMode = MovementMode.SIDE_VIEW
 ## Tuning data. Falls back to a default PlayerConfig.new() when empty.
 @export var config: PlayerConfig
-## When true, the Camera2D child is enabled and picks up a CameraBounds node.
+## When true, the active camera (see class docs) is enabled and picks up a CameraBounds node.
 @export var use_camera: bool = true
 
 @onready var side_view_motor: SideViewMotor = get_node_or_null(^"SideViewMotor")
@@ -46,7 +52,10 @@ const CAMERA_BOUNDS_GROUP := &"camera_bounds"
 @onready var hurtbox: Hurtbox = $Hurtbox
 @onready var melee: PlayerMelee = $AttackPivot
 @onready var interactor: Interactor = $Interactor
+## The active camera (PlatformerCamera in side view, Camera2D in top-down).
 @onready var camera: Camera2D = get_node_or_null(^"Camera2D")
+@onready var follow_camera: Camera2D = get_node_or_null(^"Camera2D")
+@onready var platformer_camera: PlatformerCamera = get_node_or_null(^"PlatformerCamera")
 
 ## Current presentation state (see state_changed).
 var state: StringName = STATE_IDLE
@@ -59,6 +68,7 @@ var _locks: Dictionary = {}
 var _input_override: PlayerInputState = null
 var _stun_left: float = 0.0
 var _dead: bool = false
+var _surface_mods: Dictionary = {}  # instance id (int) -> Vector3(speed, jump, accel)
 
 
 func _ready() -> void:
@@ -76,10 +86,22 @@ func _ready() -> void:
 	melee.attack_started.connect(func(dir: Vector2) -> void: attacked.emit(dir))
 	melee.hit_confirmed.connect(_on_hit_confirmed)
 	_select_motor()
-	if camera:
-		camera.enabled = use_camera
-		if use_camera:
-			apply_camera_bounds.call_deferred()
+	_select_camera()
+	if camera and use_camera:
+		apply_camera_bounds.call_deferred()
+
+
+func _select_camera() -> void:
+	var use_rig := movement_mode == MovementMode.SIDE_VIEW and platformer_camera != null
+	camera = platformer_camera if use_rig else follow_camera
+	for c: Camera2D in [follow_camera, platformer_camera]:
+		if c == null:
+			continue
+		var active := c == camera and use_camera
+		c.enabled = active
+		c.process_mode = Node.PROCESS_MODE_INHERIT if active else Node.PROCESS_MODE_DISABLED
+	if use_rig and use_camera:
+		platformer_camera.target = self
 
 
 func _select_motor() -> void:
@@ -235,6 +257,9 @@ func _on_motor_jumped() -> void:
 func _on_motor_landed() -> void:
 	landed.emit()
 
+func _on_motor_skidded() -> void:
+	skidded.emit()
+
 func _on_motor_dashed(direction: Vector2) -> void:
 	if config.dash_iframe_time > 0.0:
 		health.set_invulnerable_for(config.dash_iframe_time)
@@ -272,10 +297,59 @@ func _on_damaged(event: DamageEvent) -> void:
 		kb.y = minf(kb.y, 0.0) - config.hurt_knockback_lift
 	apply_knockback(kb, config.hurt_stun_time)
 	InputFeedback.rumble_preset(&"player_hurt")
+	add_camera_trauma(config.hurt_trauma)
 	hurt.emit(event)
 
 func _on_hit_confirmed(_hurtbox: Hurtbox, _event: DamageEvent) -> void:
 	InputFeedback.rumble_preset(&"hit_confirm")
+	add_camera_trauma(config.hit_trauma)
+	HitStop.trigger(get_tree(), config.hit_stop_duration, config.hit_stop_time_scale)
+
+## Adds screen-shake trauma to the active camera (no-op without a rig or when
+## the "screen_shake" setting is off).
+func add_camera_trauma(amount: float) -> void:
+	if use_camera and camera and camera.has_method(&"add_trauma"):
+		camera.call(&"add_trauma", amount)
+
+
+# ------------------------------------------------------------------ surface modifiers
+
+## Level gimmicks (sticky puddles, ice...) slow / boost the side-view motor.
+## One entry per `source`; calling again replaces that source's values.
+## Multiple sources combine multiplicatively. Freed sources are ignored.
+func set_surface_modifier(source: Object, speed_mult: float, jump_mult: float, accel_mult: float) -> void:
+	if source == null:
+		return
+	_surface_mods[source.get_instance_id()] = Vector3(speed_mult, jump_mult, accel_mult)
+
+func clear_surface_modifier(source: Object) -> void:
+	if source:
+		_surface_mods.erase(source.get_instance_id())
+
+func clear_all_surface_modifiers() -> void:
+	_surface_mods.clear()
+
+func has_surface_modifier(source: Object) -> bool:
+	return source != null and _surface_mods.has(source.get_instance_id())
+
+## Combined (speed, jump, accel) multipliers of all live sources.
+func get_surface_multipliers() -> Vector3:
+	var m := Vector3.ONE
+	for id: int in _surface_mods.keys():
+		if not is_instance_id_valid(id):
+			_surface_mods.erase(id)
+			continue
+		m *= _surface_mods[id]
+	return m
+
+func get_surface_speed_multiplier() -> float:
+	return get_surface_multipliers().x
+
+func get_surface_jump_multiplier() -> float:
+	return get_surface_multipliers().y
+
+func get_surface_accel_multiplier() -> float:
+	return get_surface_multipliers().z
 
 ## Instantly kills the player (kill zones, scripted deaths).
 func kill() -> void:
@@ -308,6 +382,7 @@ func _start_death() -> void:
 func on_spawned(spawn: Node2D) -> void:
 	velocity = Vector2.ZERO
 	_stun_left = 0.0
+	clear_all_surface_modifiers()
 	if _motor:
 		_motor.reset_state()
 	var f: Variant = spawn.get(&"facing") if spawn else null
@@ -315,11 +390,18 @@ func on_spawned(spawn: Node2D) -> void:
 		set_facing(f)
 	if camera and use_camera:
 		apply_camera_bounds()
-		camera.reset_smoothing()
+		if camera is PlatformerCamera:
+			(camera as PlatformerCamera).snap_to_target()
+		else:
+			camera.reset_smoothing()
 
 ## Copies limits from the first node in group "camera_bounds" (a CameraBounds).
+## The PlatformerCamera reads bounds / LevelInfo zoom itself.
 func apply_camera_bounds() -> void:
 	if camera == null or not is_inside_tree():
+		return
+	if camera is PlatformerCamera:
+		(camera as PlatformerCamera).refresh_level_settings()
 		return
 	var bounds := get_tree().get_first_node_in_group(CAMERA_BOUNDS_GROUP)
 	if bounds and bounds.has_method(&"get_global_rect"):

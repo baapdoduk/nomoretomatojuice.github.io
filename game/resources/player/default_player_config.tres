@@ -4,3 +4,16 @@
 
 [resource]
 script = ExtResource("1")
+move_speed = 180.0
+ground_accel = 900.0
+ground_decel = 1200.0
+ground_turn_decel = 2200.0
+gravity = 900.0
+fall_gravity_multiplier = 1.4
+max_fall_speed = 320.0
+jump_velocity = 370.0
+jump_cut_multiplier = 0.5
+apex_hang_multiplier = 0.6
+apex_hang_speed = 40.0
+corner_correction = 4.0
+step_up_height = 3.0
