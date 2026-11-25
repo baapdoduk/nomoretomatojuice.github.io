@@ -1,0 +1,168 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/tests/combat_lab.gd" id="1_lab"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/camera_bounds.tscn" id="2_bounds"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/solid_block.tscn" id="3_block"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/spawn_point.tscn" id="4_spawn"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/checkpoint.tscn" id="5_cp"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/scene_door.tscn" id="6_door"]
+[ext_resource type="PackedScene" path="res://scenes/combat/boss_arena.tscn" id="7_arena"]
+[ext_resource type="PackedScene" path="res://scenes/combat/training_dummy.tscn" id="8_dummy"]
+[ext_resource type="PackedScene" path="res://scenes/combat/mogu_bottle_boss.tscn" id="9_mogu"]
+[ext_resource type="Script" path="res://scripts/combat/boss_fight_trigger.gd" id="10_trigger"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/gate.tscn" id="11_gate"]
+[ext_resource type="PackedScene" path="res://scenes/core/player/player.tscn" id="12_player"]
+[ext_resource type="PackedScene" path="res://scenes/core/ui/hud.tscn" id="13_hud"]
+
+[sub_resource type="RectangleShape2D" id="Rect_gate"]
+size = Vector2(16, 60)
+
+[sub_resource type="RectangleShape2D" id="Rect_mogu_trigger"]
+size = Vector2(64, 24)
+
+[node name="CombatLab" type="Node2D" node_paths=PackedStringArray("boss", "side_boss", "victory_checkpoint", "debug_label", "info_label")]
+script = ExtResource("1_lab")
+boss = NodePath("Arena/Boss")
+side_boss = NodePath("MoguBottleBoss")
+victory_checkpoint = NodePath("Interactables/CheckpointPreBoss")
+debug_label = NodePath("LabUI/DebugLabel")
+info_label = NodePath("LabUI/InfoLabel")
+
+[node name="Floor" type="ColorRect" parent="."]
+z_index = -11
+offset_right = 1440.0
+offset_bottom = 720.0
+mouse_filter = 2
+color = Color(0.15, 0.17, 0.19, 1)
+
+[node name="CameraBounds" parent="." instance=ExtResource("2_bounds")]
+bounds = Rect2(0, 0, 1440, 720)
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="OuterTop" parent="Walls" instance=ExtResource("3_block")]
+size = Vector2(1440, 16)
+
+[node name="OuterBottom" parent="Walls" instance=ExtResource("3_block")]
+position = Vector2(0, 704)
+size = Vector2(1440, 16)
+
+[node name="OuterLeft" parent="Walls" instance=ExtResource("3_block")]
+position = Vector2(0, 16)
+size = Vector2(16, 688)
+
+[node name="OuterRight" parent="Walls" instance=ExtResource("3_block")]
+position = Vector2(1424, 16)
+size = Vector2(16, 688)
+
+[node name="SideRoomWallLeft" parent="Walls" instance=ExtResource("3_block")]
+position = Vector2(16, 280)
+size = Vector2(184, 16)
+
+[node name="SideRoomWallRight" parent="Walls" instance=ExtResource("3_block")]
+position = Vector2(264, 280)
+size = Vector2(200, 16)
+
+[node name="SideRoomWallEast" parent="Walls" instance=ExtResource("3_block")]
+position = Vector2(464, 16)
+size = Vector2(16, 280)
+
+[node name="EntranceEastLower" parent="Walls" instance=ExtResource("3_block")]
+position = Vector2(480, 540)
+size = Vector2(16, 164)
+
+[node name="ExitRoomTop" parent="Walls" instance=ExtResource("3_block")]
+position = Vector2(1120, 280)
+size = Vector2(304, 16)
+
+[node name="ExitRoomBottom" parent="Walls" instance=ExtResource("3_block")]
+position = Vector2(1120, 424)
+size = Vector2(304, 16)
+
+[node name="Arena" parent="." instance=ExtResource("7_arena")]
+position = Vector2(480, 180)
+
+[node name="ExitGate" parent="." instance=ExtResource("11_gate")]
+position = Vector2(1112, 360)
+required_flags = Array[StringName]([&"boss.test_boss.defeated"])
+gate_size = Vector2(16, 60)
+
+[node name="CollisionShape2D" parent="ExitGate"]
+shape = SubResource("Rect_gate")
+
+[node name="TrainingDummy" parent="." instance=ExtResource("8_dummy")]
+position = Vector2(80, 360)
+
+[node name="MoguBottleBoss" parent="." instance=ExtResource("9_mogu")]
+position = Vector2(232, 110)
+wait_for_trigger = true
+
+[node name="MoguTrigger" type="Area2D" parent="." node_paths=PackedStringArray("boss")]
+position = Vector2(232, 250)
+script = ExtResource("10_trigger")
+boss = NodePath("../MoguBottleBoss")
+
+[node name="Shape" type="CollisionShape2D" parent="MoguTrigger"]
+shape = SubResource("Rect_mogu_trigger")
+
+[node name="Spawns" type="Node2D" parent="."]
+
+[node name="Start" parent="Spawns" instance=ExtResource("4_spawn")]
+position = Vector2(120, 620)
+is_default = true
+
+[node name="SideRoom" parent="Spawns" instance=ExtResource("4_spawn")]
+position = Vector2(232, 330)
+spawn_id = &"side_room"
+facing = Vector2(0, -1)
+
+[node name="Interactables" type="Node2D" parent="."]
+
+[node name="CheckpointPreBoss" parent="Interactables" instance=ExtResource("5_cp")]
+position = Vector2(440, 380)
+checkpoint_id = &"pre_boss"
+toast_text = "Checkpoint (boss ahead)"
+
+[node name="DoorHub" parent="Interactables" instance=ExtResource("6_door")]
+position = Vector2(1340, 370)
+target_scene = "res://scenes/tests/test_hub.tscn"
+prompt_text = "Victory! Back to hub"
+
+[node name="Player" parent="." instance=ExtResource("12_player")]
+position = Vector2(120, 620)
+movement_mode = 1
+
+[node name="HUD" parent="." instance=ExtResource("13_hud")]
+
+[node name="LabUI" type="CanvasLayer" parent="."]
+layer = 11
+
+[node name="HelpLabel" type="Label" parent="LabUI"]
+offset_left = 6.0
+offset_top = 326.0
+offset_right = 6.0
+offset_bottom = 326.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "COMBAT LAB  move: WASD/arrows  dash: Shift/Circle  attack: J/Square  interact: E/Triangle  pause: Esc/Options
+Checkpoint east, then the arena. Hit the boss when its shield ring opens (recovery). North room: Mogu bottle prototype. Assist timing is in the pause menu."
+
+[node name="InfoLabel" type="Label" parent="LabUI"]
+offset_left = 6.0
+offset_top = 250.0
+offset_right = 6.0
+offset_bottom = 250.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+
+[node name="DebugLabel" type="Label" parent="LabUI"]
+offset_left = 500.0
+offset_top = 40.0
+offset_right = 500.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.7, 1, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
