@@ -20,7 +20,8 @@ const DEFAULT_FADE := 0.25
 const FADE_LAYER := 100
 const STYLE_FADE := &"fade"
 const STYLE_IRIS := &"iris"
-## Iris wipe = circle closing on the player / opening on the new spawn.
+## Optional iris wipe (circle closing on the player). Default is a plain fade:
+## an iris-to-black on doors/death reads as a well-known platformer signature.
 const TRANSITION_SHADER := """
 shader_type canvas_item;
 uniform float progress : hint_range(0.0, 1.0) = 0.0;
@@ -42,7 +43,7 @@ void fragment() {
 var is_transitioning := false
 var current_spawn_id: StringName = &""
 ## Style used when change_scene() gets no explicit style.
-var default_style: StringName = STYLE_IRIS
+var default_style: StringName = STYLE_FADE
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect
