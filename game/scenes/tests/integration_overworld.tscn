@@ -1,0 +1,244 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/tests/side_view_lab.gd" id="1_3ylgw"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/camera_bounds.tscn" id="2_dyj87"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/solid_block.tscn" id="3_wciql"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/spawn_point.tscn" id="4_uhg8s"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/checkpoint.tscn" id="5_wx6ap"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/pickup.tscn" id="6_rqb2b"]
+[ext_resource type="Resource" path="res://resources/items/int_memory.tres" id="7_32y1b"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/scene_door.tscn" id="8_5javt"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/popup_interactable.tscn" id="9_26b1o"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/gate.tscn" id="10_pcdjo"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/light_emitter.tscn" id="11_7jcsm"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/mirror.tscn" id="12_lvi1t"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/light_receiver.tscn" id="13_o0jpm"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/puzzle_controller.tscn" id="14_qj446"]
+[ext_resource type="PackedScene" path="res://scenes/combat/boss.tscn" id="15_s0c0h"]
+[ext_resource type="Script" path="res://scripts/combat/boss_fight_trigger.gd" id="16_gvhlh"]
+[ext_resource type="PackedScene" path="res://scenes/core/interaction/one_way_door.tscn" id="17_ne2ns"]
+[ext_resource type="Script" path="res://scripts/tests/integration_goal.gd" id="18_uho4s"]
+[ext_resource type="Script" path="res://scripts/core/interaction/interactable_visual.gd" id="19_ic3sg"]
+[ext_resource type="PackedScene" path="res://scenes/core/level/landmark.tscn" id="20_xwrkv"]
+[ext_resource type="PackedScene" path="res://scenes/core/player/player.tscn" id="21_l76m0"]
+[ext_resource type="PackedScene" path="res://scenes/core/ui/hud.tscn" id="22_8hegy"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2127g"]
+size = Vector2(24, 240)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tpfmt"]
+size = Vector2(32, 32)
+
+[node name="IntegrationOverworld" type="Node2D" unique_id=1690919115]
+script = ExtResource("1_3ylgw")
+show_debug = false
+
+[node name="Floor" type="ColorRect" parent="." unique_id=528061897]
+z_index = -10
+offset_right = 960.0
+offset_bottom = 360.0
+mouse_filter = 2
+color = Color(0.15, 0.19, 0.17, 1)
+
+[node name="CameraBounds" parent="." unique_id=1954286967 instance=ExtResource("2_dyj87")]
+bounds = Rect2(0, 0, 960, 360)
+
+[node name="Walls" type="Node2D" parent="." unique_id=207433429]
+
+[node name="Top" parent="Walls" unique_id=353546076 instance=ExtResource("3_wciql")]
+size = Vector2(960, 16)
+
+[node name="Bottom" parent="Walls" unique_id=1565938278 instance=ExtResource("3_wciql")]
+position = Vector2(0, 344)
+size = Vector2(960, 16)
+
+[node name="Left" parent="Walls" unique_id=44785723 instance=ExtResource("3_wciql")]
+position = Vector2(0, 16)
+size = Vector2(16, 328)
+
+[node name="Right" parent="Walls" unique_id=1791445904 instance=ExtResource("3_wciql")]
+position = Vector2(944, 16)
+size = Vector2(16, 328)
+
+[node name="DividerA" parent="Walls" unique_id=890397850 instance=ExtResource("3_wciql")]
+position = Vector2(16, 80)
+size = Vector2(84, 16)
+
+[node name="DividerB" parent="Walls" unique_id=1941891216 instance=ExtResource("3_wciql")]
+position = Vector2(160, 80)
+size = Vector2(620, 16)
+
+[node name="DividerC" parent="Walls" unique_id=1960187200 instance=ExtResource("3_wciql")]
+position = Vector2(828, 80)
+size = Vector2(116, 16)
+
+[node name="CorridorWall" parent="Walls" unique_id=1548142907 instance=ExtResource("3_wciql")]
+position = Vector2(320, 16)
+size = Vector2(16, 24)
+
+[node name="WallAUpper" parent="Walls" unique_id=1717422020 instance=ExtResource("3_wciql")]
+position = Vector2(320, 96)
+size = Vector2(16, 104)
+
+[node name="WallALower" parent="Walls" unique_id=2019225176 instance=ExtResource("3_wciql")]
+position = Vector2(320, 248)
+size = Vector2(16, 96)
+
+[node name="WallBUpper" parent="Walls" unique_id=1317553795 instance=ExtResource("3_wciql")]
+position = Vector2(640, 96)
+size = Vector2(16, 104)
+
+[node name="WallBLower" parent="Walls" unique_id=804120900 instance=ExtResource("3_wciql")]
+position = Vector2(640, 248)
+size = Vector2(16, 96)
+
+[node name="Spawns" type="Node2D" parent="." unique_id=960687614]
+
+[node name="Start" parent="Spawns" unique_id=298611944 instance=ExtResource("4_uhg8s")]
+position = Vector2(70, 300)
+is_default = true
+
+[node name="FromInterior" parent="Spawns" unique_id=2019472483 instance=ExtResource("4_uhg8s")]
+position = Vector2(240, 300)
+spawn_id = &"from_integration_interior"
+facing = Vector2(0, -1)
+
+[node name="Interactables" type="Node2D" parent="." unique_id=1834853239]
+
+[node name="CheckpointStart" parent="Interactables" unique_id=692774175 instance=ExtResource("5_wx6ap")]
+position = Vector2(110, 300)
+checkpoint_id = &"int_start"
+
+[node name="Memory" parent="Interactables" unique_id=1246732478 instance=ExtResource("6_rqb2b")]
+position = Vector2(180, 180)
+item = ExtResource("7_32y1b")
+
+[node name="DoorInterior" parent="Interactables" unique_id=2117962565 instance=ExtResource("8_5javt")]
+position = Vector2(240, 336)
+target_scene = "res://scenes/tests/integration_interior.tscn"
+target_spawn_id = &"from_integration_overworld"
+prompt_text = "Enter house"
+
+[node name="Sign" parent="Interactables" unique_id=1498918262 instance=ExtResource("9_26b1o")]
+position = Vector2(60, 200)
+title = "Integration slice"
+body = "Memory > house (key) > key gate > light puzzle > boss > shortcut back here > shrine.
+Rotate mirrors with Interact."
+
+[node name="Puzzle" type="Node2D" parent="." unique_id=326537326]
+
+[node name="GateKey" parent="Puzzle" unique_id=89736759 instance=ExtResource("10_pcdjo")]
+position = Vector2(328, 224)
+required_items = Array[StringName]([&"int_key"])
+open_flag = &"int.gate_key.open"
+
+[node name="Emitter" parent="Puzzle" unique_id=1015695831 instance=ExtResource("11_7jcsm")]
+position = Vector2(360, 130)
+
+[node name="MirrorA" parent="Puzzle" unique_id=1335719069 instance=ExtResource("12_lvi1t")]
+position = Vector2(580, 130)
+rotation = 2.3561945
+
+[node name="MirrorB" parent="Puzzle" unique_id=1213603092 instance=ExtResource("12_lvi1t")]
+position = Vector2(580, 300)
+rotation = 0.7853982
+
+[node name="Receiver" parent="Puzzle" unique_id=1578904446 instance=ExtResource("13_o0jpm")]
+position = Vector2(420, 300)
+
+[node name="Controller" parent="Puzzle" unique_id=909008091 node_paths=PackedStringArray("devices") instance=ExtResource("14_qj446")]
+position = Vector2(440, 330)
+devices = [NodePath("../Receiver")]
+solved_flag = &"int.puzzle.solved"
+
+[node name="GatePuzzle" parent="Puzzle" unique_id=1863500860 node_paths=PackedStringArray("inputs") instance=ExtResource("10_pcdjo")]
+position = Vector2(648, 224)
+inputs = [NodePath("../Controller")]
+latch_open = true
+open_flag = &"int.gate_puzzle.open"
+
+[node name="Arena" type="Node2D" parent="." unique_id=1381293992]
+
+[node name="CheckpointArena" parent="Arena" unique_id=1789837998 instance=ExtResource("5_wx6ap")]
+position = Vector2(690, 236)
+checkpoint_id = &"int_arena"
+
+[node name="Boss" parent="Arena" unique_id=2052288927 instance=ExtResource("15_s0c0h")]
+position = Vector2(870, 224)
+wait_for_trigger = true
+
+[node name="BossFightTrigger" type="Area2D" parent="Arena" unique_id=1401758041 node_paths=PackedStringArray("boss")]
+position = Vector2(760, 220)
+script = ExtResource("16_gvhlh")
+boss = NodePath("../Boss")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/BossFightTrigger" unique_id=1406602360]
+shape = SubResource("RectangleShape2D_2127g")
+
+[node name="GateVictory" parent="Arena" unique_id=1057500891 instance=ExtResource("10_pcdjo")]
+position = Vector2(804, 88)
+rotation = 1.5707964
+required_flags = Array[StringName]([&"boss.test_boss.defeated"])
+
+[node name="Corridor" type="Node2D" parent="." unique_id=946364166]
+
+[node name="Shortcut" parent="Corridor" unique_id=1528004920 instance=ExtResource("17_ne2ns")]
+position = Vector2(328, 80)
+open_flag = &"int.shortcut.open"
+prompt_offset = Vector2(0, -44)
+
+[node name="Goal" type="Area2D" parent="Corridor" unique_id=471026248]
+position = Vector2(60, 70)
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("18_uho4s")
+prompt_text = "Finish"
+prompt_offset = Vector2(0, -40)
+required_flags = Array[StringName]([&"boss.test_boss.defeated"])
+blocked_message = "The shrine is still sealed."
+locked_prompt_text = "Defeat the boss first"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Corridor/Goal" unique_id=1906940143]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_tpfmt")
+
+[node name="Visual" type="Node2D" parent="Corridor/Goal" unique_id=492998065]
+position = Vector2(0, -14)
+script = ExtResource("19_ic3sg")
+style = 3
+size = Vector2(14, 28)
+color = Color(1, 0.8, 0.3, 1)
+
+[node name="GoalLandmark" parent="Corridor" unique_id=490775470 instance=ExtResource("20_xwrkv")]
+position = Vector2(36, 76)
+caption = "SHRINE"
+height = 40.0
+width = 12.0
+
+[node name="DoorHub" parent="Corridor" unique_id=1422961602 instance=ExtResource("8_5javt")]
+position = Vector2(180, 76)
+target_scene = "res://scenes/tests/test_hub.tscn"
+prompt_text = "Hub"
+prompt_offset = Vector2(0, -40)
+required_flags = Array[StringName]([&"integration.complete"])
+locked_prompt_text = "Finish at the shrine"
+
+[node name="Player" parent="." unique_id=1323098726 instance=ExtResource("21_l76m0")]
+position = Vector2(70, 300)
+movement_mode = 1
+
+[node name="HUD" parent="." unique_id=537559586 instance=ExtResource("22_8hegy")]
+
+[node name="LabUI" type="CanvasLayer" parent="." unique_id=1314466603]
+layer = 9
+
+[node name="HelpLabel" type="Label" parent="LabUI" unique_id=411020758]
+offset_left = 6.0
+offset_top = 42.0
+offset_right = 6.0
+offset_bottom = 42.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "INTEGRATION (overworld)  Memory > house > key gate > mirrors (Interact rotates) > boss > shortcut > shrine"

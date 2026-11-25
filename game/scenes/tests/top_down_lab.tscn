@@ -1,5 +1,7 @@
 [gd_scene format=3]
 
+[ext_resource type="PackedScene" path="res://scenes/core/ui/hud.tscn" id="hud_1"]
+
 [ext_resource type="Script" path="res://scripts/tests/top_down_lab.gd" id="1_fd61f"]
 [ext_resource type="PackedScene" path="res://scenes/core/level/camera_bounds.tscn" id="2_h3knl"]
 [ext_resource type="PackedScene" path="res://scenes/core/level/solid_block.tscn" id="3_jsayh"]
@@ -130,9 +132,9 @@ layer = 10
 
 [node name="HelpLabel" type="Label" parent="LabUI" unique_id=1090914576]
 offset_left = 6.0
-offset_top = 4.0
+offset_top = 42.0
 offset_right = 6.0
-offset_bottom = 4.0
+offset_bottom = 42.0
 theme_override_font_sizes/font_size = 8
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
@@ -157,3 +159,5 @@ theme_override_font_sizes/font_size = 8
 theme_override_colors/font_color = Color(0.7, 1, 0.7, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
+
+[node name="HUD" parent="." instance=ExtResource("hud_1")]

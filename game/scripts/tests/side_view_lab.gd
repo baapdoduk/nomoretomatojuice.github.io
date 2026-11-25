@@ -1,7 +1,7 @@
 class_name ExplorationLab
 extends Node2D
 ## Root script of the exploration labs (side_view_lab / top_down_lab).
-## Updates an on-screen info label (items, flags) and, optionally, a live
+## Updates an on-screen flag label (the HUD shows hearts/items/toasts) and, optionally, a live
 ## player debug label (state, velocity, coyote/buffer, dash cooldown).
 
 @export var debug_label: Label
@@ -32,16 +32,11 @@ func _format_debug(info: Dictionary) -> String:
 	return "\n".join(lines)
 
 
+## Flags only: hearts, items and toasts are shown by the HUD.
 func _format_info() -> String:
-	var ids := GameState.get_item_ids()
-	var items := PackedStringArray()
-	for id in ids:
-		var n := GameState.get_item_count(id)
-		items.append(String(id) if n == 1 else "%s x%d" % [id, n])
 	var flags := PackedStringArray()
 	var all := GameState.get_all_flags()
 	for f in all:
 		if bool(all[f]):
 			flags.append(String(f))
-	return "HP %d/%d\nItems: %s\nFlags: %s" % [GameState.health, GameState.max_health,
-		", ".join(items) if not items.is_empty() else "-", ", ".join(flags) if not flags.is_empty() else "-"]
+	return "Flags: %s" % (", ".join(flags) if not flags.is_empty() else "-")
