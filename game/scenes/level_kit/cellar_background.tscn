@@ -1,0 +1,39 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/level_kit/cellar_backdrop.gd" id="1"]
+
+[node name="CellarBackground" type="Node2D"]
+z_index = -20
+
+[node name="Sky" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0, 0)
+
+[node name="Backdrop" type="Node2D" parent="Sky"]
+script = ExtResource("1")
+kind = 0
+top = -400.0
+bottom = 800.0
+
+[node name="Far" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0.15, 0.15)
+repeat_size = Vector2(640, 0)
+repeat_times = 3
+
+[node name="Backdrop" type="Node2D" parent="Far"]
+position = Vector2(0, 300)
+script = ExtResource("1")
+kind = 1
+rng_seed = 7
+
+[node name="Mid" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0.45, 0.45)
+repeat_size = Vector2(640, 0)
+repeat_times = 3
+
+[node name="Backdrop" type="Node2D" parent="Mid"]
+position = Vector2(0, 300)
+script = ExtResource("1")
+kind = 2
+rng_seed = 21
+silhouette = Color(0.2, 0.16, 0.22, 1)
+detail = Color(0.27, 0.22, 0.29, 1)

@@ -4,6 +4,9 @@ extends CanvasLayer
 ## talks to GameState / InputFeedback / SceneRouter, so it works without a player.
 ##   - hearts      <- GameState.health_changed
 ##   - item bar    <- GameState.inventory_changed (+ "Got: <name>" toast on item_added)
+##   - Fizz counter <- GameState.coins_changed (bubble icon + number)
+##   - shard slots (top-right, 3 polaroids) <- the scene's LevelInfo + "shard.<level>.<n>"
+##     flags; hidden when the scene has no LevelInfo
 ##   - toast queue <- GameState.notification_requested, or show_toast() (group "hud")
 ##   - debug corner (F3 toggles; off by default)
 ## Toasts still visible when a scene transition starts are carried over to the
@@ -19,6 +22,19 @@ extends CanvasLayer
 		show_status = value
 		if is_node_ready():
 			_top_left.visible = value
+			refresh_shards()
+## Fizz counter (part of the status block).
+@export var show_fizz: bool = true:
+	set(value):
+		show_fizz = value
+		if is_node_ready():
+			_fizz_row.visible = value
+@export var fizz_icon_color: Color = Color(0.72, 0.95, 1.0, 0.9)
+@export var fizz_rim_color: Color = Color(0.35, 0.8, 0.85)
+@export var shard_frame_color: Color = Color(0.96, 0.93, 0.86)
+@export var shard_empty_color: Color = Color(0.12, 0.08, 0.14, 0.85)
+@export var shard_photo_color: Color = Color(0.42, 0.26, 0.45)
+@export var shard_light_color: Color = Color(0.95, 0.68, 0.3)
 @export var debug_visible: bool = false:
 	set(value):
 		debug_visible = value
@@ -30,6 +46,10 @@ extends CanvasLayer
 @onready var _item_bar: HBoxContainer = %ItemBar
 @onready var _toast_box: VBoxContainer = %ToastBox
 @onready var _debug_label: Label = %DebugLabel
+@onready var _fizz_row: HBoxContainer = %FizzRow
+@onready var _fizz_icon: Control = %FizzIcon
+@onready var _fizz_label: Label = %FizzLabel
+@onready var _shard_bar: HBoxContainer = %ShardBar
 
 ## Pending toasts: Array of [text, duration].
 var _queue: Array = []
@@ -37,6 +57,8 @@ var _queue: Array = []
 var _active: Array = []
 
 ## Toasts handed from a HUD that is being unloaded to the next one: [text, time_left].
+var _shards_dirty := false
+
 static var _carry_over: Array = []
 static var _carry_over_msec: int = 0
 
@@ -49,8 +71,17 @@ func _ready() -> void:
 	GameState.item_added.connect(_on_item_added)
 	GameState.notification_requested.connect(show_toast)
 	SceneRouter.transition_started.connect(_on_transition_started)
+	GameState.coins_changed.connect(_on_coins_changed)
+	GameState.flag_changed.connect(_on_flag_changed)
+	GameState.state_restored.connect(refresh_shards)
+	get_tree().node_added.connect(_on_tree_node_changed)
+	get_tree().node_removed.connect(_on_tree_node_changed)
+	_fizz_icon.draw.connect(_draw_fizz_icon)
+	_fizz_row.visible = show_fizz
 	_on_health_changed(GameState.health, GameState.max_health)
+	_on_coins_changed(GameState.coins)
 	refresh_items()
+	refresh_shards()
 	_debug_label.visible = debug_visible
 	_top_left.visible = show_status
 	if not _carry_over.is_empty() and Time.get_ticks_msec() - _carry_over_msec < 5000:
@@ -87,6 +118,79 @@ func get_item_bar_ids() -> Array[StringName]:
 		if not child.is_queued_for_deletion():
 			out.append(StringName(child.get_meta(&"item_id", &"")))
 	return out
+
+
+## Number shown by the Fizz counter.
+func get_fizz_count() -> int:
+	return int(_fizz_label.text)
+
+## Shard slot states (true = collected); empty when the bar is hidden.
+func get_shard_slots() -> Array[bool]:
+	var out: Array[bool] = []
+	if not _shard_bar.visible:
+		return out
+	for child in _shard_bar.get_children():
+		if not child.is_queued_for_deletion():
+			out.append(bool(child.get_meta(&"collected", false)))
+	return out
+
+func is_shard_bar_visible() -> bool:
+	return _shard_bar.visible
+
+
+## Rebuilds the polaroid slots from the scene's LevelInfo (hidden without one).
+func refresh_shards() -> void:
+	if not is_node_ready():
+		return
+	for child in _shard_bar.get_children():
+		_shard_bar.remove_child(child)
+		child.queue_free()
+	var info := LevelInfo.find_in(get_tree())
+	_shard_bar.visible = info != null and info.shard_count > 0 and show_status
+	if not _shard_bar.visible:
+		return
+	for got in info.get_shard_states():
+		var slot := Control.new()
+		slot.custom_minimum_size = Vector2(13, 16)
+		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot.set_meta(&"collected", got)
+		slot.draw.connect(_draw_shard_slot.bind(slot, got))
+		_shard_bar.add_child(slot)
+
+
+func _draw_shard_slot(slot: Control, got: bool) -> void:
+	var r := Rect2(Vector2.ZERO, slot.custom_minimum_size)
+	slot.draw_rect(r.grow(1), Color(0.06, 0.04, 0.08, 0.9))
+	if got:
+		slot.draw_rect(r, shard_frame_color)
+		slot.draw_rect(Rect2(2, 2, r.size.x - 4, r.size.y - 7), shard_photo_color)
+		slot.draw_circle(Vector2(r.size.x - 5, 5), 1.5, shard_light_color)
+	else:
+		slot.draw_rect(r, shard_empty_color)
+		slot.draw_rect(r.grow(-1), Color(shard_frame_color, 0.35), false, 1.0)
+
+
+func _draw_fizz_icon() -> void:
+	var c := _fizz_icon.size * 0.5
+	var rad := minf(c.x, c.y) - 0.5
+	_fizz_icon.draw_circle(c, rad, fizz_icon_color)
+	_fizz_icon.draw_arc(c, rad, 0.0, TAU, 14, fizz_rim_color, 1.0)
+	_fizz_icon.draw_circle(c + Vector2(-rad * 0.35, -rad * 0.35), rad * 0.3, Color.WHITE)
+
+
+func _on_coins_changed(total: int) -> void:
+	_fizz_label.text = str(total)
+
+
+func _on_flag_changed(flag: StringName, _value: Variant) -> void:
+	if String(flag).begins_with("shard."):
+		refresh_shards()
+
+
+## LevelInfo added/removed: rebuild the slots on the next frame (after removal).
+func _on_tree_node_changed(node: Node) -> void:
+	if node is LevelInfo:
+		_shards_dirty = true
 
 
 ## Rebuilds the item bar from GameState.
@@ -154,6 +258,9 @@ func _on_transition_started(_path: String, _spawn: StringName) -> void:
 
 
 func _process(delta: float) -> void:
+	if _shards_dirty:
+		_shards_dirty = false
+		refresh_shards()
 	for i in range(_active.size() - 1, -1, -1):
 		var t: Dictionary = _active[i]
 		t.time_left -= delta
