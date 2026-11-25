@@ -11,6 +11,7 @@ const SCENES := [
 	"res://scenes/tests/puzzle_lab_world.tscn",
 	"res://scenes/tests/integration_overworld.tscn",
 	"res://scenes/tests/integration_interior.tscn",
+	"res://scenes/level_kit/kit_preview.tscn",
 ]
 var _out := "user://screens"
 
